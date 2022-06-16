@@ -909,6 +909,11 @@
                 TMS570_PIN_AND_FNC(TMS570_BALL_B11, 5), \
                 TMS570_PIN_AND_FNC(TMS570_PIN_MMR_ALT_eQEP2S, 1))
 
+/// (TM) TODO: is this correct? LS3137ZWT uses TMS570_PIN_AND_FNC(TMS570_BALL_WITH_MMR(29, 3), 0)
+///   Per the schematic, this pin (called MII_RX_DV / RX_DV) attaches to pad B11 and can select
+///   between MII and RMII mode for the PHY. A pin like this is required for the lwip tms570 rtems port
+#define TMS570_MMR_SELECT_GMII_SEL TMS570_BALL_B11_MII_RX_DV
+
 #define TMS570_BALL_D8 TMS570_BALL_WITH_MMR(34, 3)
 #define TMS570_BALL_D8_HET2_01 TMS570_PIN_WITH_IN_ALT( \
                 TMS570_PIN_AND_FNC(TMS570_BALL_D8, 0), \
@@ -974,7 +979,7 @@
 
 /* Default pinmux select */
 
-#define TMS570_PINMMR_DEFAULT_INIT_LIST(per_pin_action, common_arg) \
+#define TMS570LC4357_PINMMR_DEFAULT_INIT_LIST(per_pin_action, common_arg) \
   per_pin_action(common_arg, TMS570_BALL_N19_AD1EVT) \
   per_pin_action(common_arg, TMS570_BALL_D4_EMIF_ADDR_00) \
   per_pin_action(common_arg, TMS570_BALL_D5_EMIF_ADDR_01) \

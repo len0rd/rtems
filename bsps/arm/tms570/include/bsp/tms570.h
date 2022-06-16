@@ -108,8 +108,14 @@
 #define TMS570_HTU1 (*(volatile tms570_htu_t*)0xFFF7A400)
 #define TMS570_HTU2 (*(volatile tms570_htu_t*)0xFFF7A500)
 #define TMS570_I2C (*(volatile tms570_i2c_t*)0xFFF7D400)
-#define TMS570_IOMM (*(volatile tms570_iomm_t*)0XFFFFEA00)
-#define TMS570_PINMUX (*(volatile tms570_pinmux_t*)0xFFFFEB10)
+#if defined(ARM_TMS570LC4357)
+    #define TMS570_IOMM (*(volatile tms570_iomm_t*)0XFFFF1C00)
+#elif defined(ARM_TMS570LS3137)
+    #define TMS570_IOMM (*(volatile tms570_iomm_t*)0XFFFFEA00)
+#else
+    #warning "Unknown or no TMS570 BSP variant defined"
+#endif
+#define TMS570_PINMUX ((volatile uint32_t*)TMS570_IOMM.PINMMR)
 #define TMS570_LIN (*(volatile tms570_lin_t*)0xFFF7E400)
 #define TMS570_MDIO (*(volatile tms570_mdio_t*)0xFCF78900)
 #define TMS570_NHET1 (*(volatile tms570_nhet_t*)0xFFF7B800)
@@ -133,5 +139,13 @@
 #define TMS570_STC (*(volatile tms570_stc_t*)0xFFFFE600)
 #define TMS570_SYS1 (*(volatile tms570_sys1_t*)0xFFFFFF00)
 #define TMS570_SYS2 (*(volatile tms570_sys2_t*)0xFFFFE100)
-#define TMS570_PCR (*(volatile tms570_pcr_t*)0xFFFFE000)
+#if defined(ARM_TMS570LC4357)
+    #define TMS570_PCR1 (*(volatile tms570_pcr_t*)0xFFFF1000)
+    #define TMS570_PCR2 (*(volatile tms570_pcr_t*)0xFCFF1000)
+    #define TMS570_PCR3 (*(volatile tms570_pcr_t*)0xFFF78000)
+#elif defined(ARM_TMS570LS3137)
+    #define TMS570_PCR1 (*(volatile tms570_pcr_t*)0xFFFFE000)
+#else
+    #warning "Unknown or no TMS570 BSP variant defined"
+#endif
 #endif /* LIBBSP_ARM_TMS570 */

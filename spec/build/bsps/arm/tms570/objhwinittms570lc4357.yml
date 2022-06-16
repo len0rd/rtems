@@ -1,0 +1,19 @@
+SPDX-License-Identifier: CC-BY-SA-4.0 OR BSD-2-Clause
+build-type: objects
+cflags: []
+copyrights:
+- Copyright (C) 2020 embedded brains GmbH (http://www.embedded-brains.de)
+cppflags: []
+cxxflags: []
+enabled-by:
+- ARM_TMS570LC4357
+includes: []
+install:
+- destination: ${BSP_INCLUDEDIR}/bsp/ti_herc
+  source:
+  - bsps/arm/tms570/include/bsp/ti_herc/errata_SSWF021_45.h
+links: []
+source:
+- bsps/arm/tms570/start/bspstarthooks_hwinit_tms570lc4357.c
+- bsps/arm/tms570/start/errata_SSWF021_45.c
+type: build

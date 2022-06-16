@@ -9,8 +9,8 @@ copyrights:
 default: true
 default-by-variant: []
 description: |
-  target used for identify TMS570LS3137 board
+  target used for identify TMS570LC4357 board
 enabled-by: true
 links: []
-name: ARM_TMS570LS3137
+name: ARM_TMS570LC4357
 type: build
