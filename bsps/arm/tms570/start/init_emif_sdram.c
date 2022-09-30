@@ -10,6 +10,9 @@
 #include <bsp/tms570.h>
 #include <bsp/tms570_hwinit.h>
 
+/// (TM) TODO: EMIF timings can be tightened up for LC4357. Look at Halcogen configuration
+///	Errata EMIF#5 on the LC4357B should also be considered when deciding
+///	when this method is called
 void tms570_emif_sdram_init( void )
 {
   uint32_t dummy;

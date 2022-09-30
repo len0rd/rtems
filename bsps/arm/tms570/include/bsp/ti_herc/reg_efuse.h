@@ -40,8 +40,12 @@
 #define LIBBSP_ARM_TMS570_EFUSE
 
 #include <bsp/utility.h>
+#include <bspopts.h>
 
 typedef struct{
+#if defined(ARM_TMS570LC4357)
+  uint8_t reserved0 [4];
+#endif
   uint32_t EFCBOUND;          /*EFC Boundary Control Register*/
   uint8_t reserved1 [12];
   uint32_t EFCPINS;           /*EFC Pins Register*/
