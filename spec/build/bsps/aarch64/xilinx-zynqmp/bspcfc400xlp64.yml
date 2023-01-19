@@ -1,19 +1,21 @@
 SPDX-License-Identifier: CC-BY-SA-4.0 OR BSD-2-Clause
-arch: riscv
-bsp: rv64imafd_medany
+arch: aarch64
+bsp: xilinx_zynqmp_lp64_cfc400x
 build-type: bsp
 cflags: []
 copyrights:
-- Copyright (C) 2020 embedded brains GmbH (http://www.embedded-brains.de)
+- Copyright (C) 2022 On-Line Applications Research (OAR)
 cppflags: []
 enabled-by: true
-family: riscv
+family: xilinx-zynqmp
 includes: []
 install: []
 links:
 - role: build-dependency
-  uid: ../../opto2
+  uid: grp_zu3eg
 - role: build-dependency
-  uid: grp
+  uid: linkcmds_lp64
+- role: build-dependency
+  uid: objfdtcfc400x
 source: []
 type: build

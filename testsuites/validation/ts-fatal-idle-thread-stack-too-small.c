@@ -3,7 +3,7 @@
 /**
  * @file
  *
- * @ingroup RTEMSTestSuiteTestsuitesValidationSmpOnly1
+ * @ingroup RTEMSTestSuiteTestsuitesFatalIdleThreadStackTooSmall
  */
 
 /*
@@ -52,43 +52,46 @@
 #include "config.h"
 #endif
 
-#include "ts-config.h"
+#include "tr-fatal-idle-thread-stack-too-small.h"
 
 #include <rtems/test.h>
 
 /**
- * @defgroup RTEMSTestSuiteTestsuitesValidationSmpOnly1 \
- *   spec:/testsuites/validation-smp-only-1
+ * @defgroup RTEMSTestSuiteTestsuitesFatalIdleThreadStackTooSmall \
+ *   spec:/testsuites/fatal-idle-thread-stack-too-small
  *
  * @ingroup RTEMSTestSuites
  *
- * @brief This SMP-only test suite validates the clustered scheduler
- *   configuration through an application configuration with a processor
- *   maximum of two, however, only the first processor has a scheduler
- *   assigned.
+ * @brief This validation test suite contains a test case which triggers a
+ *   fatal error during system initialization.
  *
  * @{
  */
 
-const char rtems_test_name[] = "ValidationSMPOnly1";
+const char rtems_test_name[] = "FatalIdleThreadStackTooSmall";
 
-#define CONFIGURE_MAXIMUM_PROCESSORS 2
+#define FATAL_SYSINIT_RUN ScoreThreadValFatalIdleThreadStackTooSmall_Run
 
-#include <rtems/score/scheduleredfsmp.h>
+static _Thread_local volatile uint8_t zero[ RTEMS_MINIMUM_STACK_SIZE ];
 
-#define CONFIGURE_SCHEDULER_EDF_SMP
+static void Init( rtems_task_argument arg )
+{
+  (void) arg;
+  rtems_fatal( RTEMS_FATAL_SOURCE_EXIT, zero[ 0 ] + 1 );
+}
 
-#include <rtems/scheduler.h>
+#define CONFIGURE_APPLICATION_DOES_NOT_NEED_CLOCK_DRIVER
 
-RTEMS_SCHEDULER_EDF_SMP( a );
+#define CONFIGURE_MAXIMUM_TASKS 1
 
-#define CONFIGURE_SCHEDULER_TABLE_ENTRIES \
-  RTEMS_SCHEDULER_TABLE_EDF_SMP( a, TEST_SCHEDULER_A_NAME )
+#define CONFIGURE_MINIMUM_TASKS_WITH_USER_PROVIDED_STORAGE 1
 
-#define CONFIGURE_SCHEDULER_ASSIGNMENTS \
-  RTEMS_SCHEDULER_ASSIGN( 0, RTEMS_SCHEDULER_ASSIGN_PROCESSOR_MANDATORY ), \
-  RTEMS_SCHEDULER_ASSIGN_NO_SCHEDULER
+#define CONFIGURE_INIT_TASK_PRIORITY 0
 
-#include "ts-default.h"
+#define CONFIGURE_INIT_TASK_CONSTRUCT_STORAGE_SIZE RTEMS_MINIMUM_STACK_SIZE
+
+#define CONFIGURE_RTEMS_INIT_TASKS_TABLE
+
+#include "ts-fatal-sysinit.h"
 
 /** @} */

@@ -52,6 +52,11 @@ install:
 - destination: ${BSP_INCLUDEDIR}/dev/spi
   source:
   - cpukit/include/dev/spi/spi.h
+- destination: ${BSP_INCLUDEDIR}/dev/can
+  source:
+  - cpukit/include/dev/can/can.h
+  - cpukit/include/dev/can/can-msg.h
+  - cpukit/include/dev/can/canqueueimpl.h
 - destination: ${BSP_INCLUDEDIR}/linux
   source:
   - cpukit/include/linux/i2c-dev.h
@@ -535,6 +540,7 @@ source:
 - cpukit/dev/serial/sc16is752-spi.c
 - cpukit/dev/serial/sc16is752.c
 - cpukit/dev/spi/spi-bus.c
+- cpukit/dev/can/can.c
 - cpukit/dtc/libfdt/fdt.c
 - cpukit/dtc/libfdt/fdt_addresses.c
 - cpukit/dtc/libfdt/fdt_empty_tree.c
@@ -1184,6 +1190,7 @@ source:
 - cpukit/rtems/src/barrierrelease.c
 - cpukit/rtems/src/barrierwait.c
 - cpukit/rtems/src/clockgetsecondssinceepoch.c
+- cpukit/rtems/src/clockgettickssinceboot.c
 - cpukit/rtems/src/clockgettickspersecond.c
 - cpukit/rtems/src/clockgettod.c
 - cpukit/rtems/src/clockgettodtimeval.c
@@ -1544,6 +1551,7 @@ source:
 - cpukit/score/src/smpbarrierwait.c
 - cpukit/score/src/stackallocator.c
 - cpukit/score/src/stackallocatorforidle.c
+- cpukit/score/src/stackallocatorforidlewkspace.c
 - cpukit/score/src/stackallocatorfree.c
 - cpukit/score/src/stackallocatorinit.c
 - cpukit/score/src/thread.c
