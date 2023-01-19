@@ -2,18 +2,19 @@ SPDX-License-Identifier: CC-BY-SA-4.0 OR BSD-2-Clause
 build-type: test-program
 cflags: []
 copyrights:
-- Copyright (C) 2021 embedded brains GmbH (http://www.embedded-brains.de)
+- Copyright (C) 2022 Prashanth S (fishesprashanth@gmail.com).
 cppflags: []
 cxxflags: []
-enabled-by: RTEMS_SMP
+enabled-by: true
 features: c cprogram
 includes: []
 ldflags: []
 links: []
 source:
-- testsuites/validation/ts-validation-smp-only-1.c
+- testsuites/libtests/can01/init.c
+- testsuites/libtests/can01/can-loopback.c
 stlib: []
-target: testsuites/validation/ts-validation-smp-only-1.exe
+target: testsuites/libtests/can01.exe
 type: build
 use-after: []
 use-before: []
