@@ -640,13 +640,13 @@ _mpuInit_:
         mcr   p15, #0,    r0, c6, c1, #4
         movw  r0,  #((0 << 15) + (0 << 14) + (0 << 13) + (0 << 12) + (0 << 11) + (0 << 10) + (0 <<  9) + (0 <<  8) + (0x15 << 1) + (1))
         mcr   p15, #0,    r0, c6, c1, #2
-        @ Setup region  
+        @ Setup region 3 - Internal RAM
         mov   r0,  #2
         mcr   p15, #0,    r0, c6, c2, #0
         ldr   r0,  r3Base
         mcr   p15, #0,    r0, c6, c1, #0    
         mov   r0,  #0x000B
-        orr   r0,  r0,    #0x1300
+        orr   r0,  r0,    #0x0300
         mcr   p15, #0,    r0, c6, c1, #4
         movw  r0,  #((0 << 15) + (0 << 14) + (0 << 13) + (0 << 12) + (0 << 11) + (0 << 10) + (0 <<  9) + (0 <<  8) + (0x12 << 1) + (1))
         mcr   p15, #0,    r0, c6, c1, #2
@@ -670,7 +670,7 @@ _mpuInit_:
         mcr   p15, #0,    r0, c6, c1, #4
         movw  r0,  #((1 << 15) + (1 << 14) + (0 << 13) + (0 << 12) + (0 << 11) + (0 << 10) + (0 <<  9) + (0 <<  8) + (0x1B << 1) + (1))
         mcr   p15, #0,    r0, c6, c1, #2
-        @ Setup region 6
+        @ Setup region 6 - EMIF CS0 == External SDRAM
         mov   r0,  #5
         mcr   p15, #0,    r0, c6, c2, #0
         ldr   r0,  r6Base
@@ -784,6 +784,21 @@ _mpuInit_:
         @ Enable mpu
         mrc   p15, #0, r0, c1, c0, #0
         orr   r0,  r0, #1
+        dsb
+        mcr   p15, #0, r0, c1, c0, #0
+        isb
+        bx    lr
+
+/*-------------------------------------------------------------------------------*/
+@ Disable Mpu
+
+    .weak     _mpuDisable_
+    .type     _mpuDisable_, %function	
+    
+_mpuDisable_:
+
+        mrc   p15, #0, r0, c1, c0, #0
+        bic   r0,  r0, #1
         dsb
         mcr   p15, #0, r0, c1, c0, #0
         isb

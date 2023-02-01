@@ -16,6 +16,7 @@ void _errata_CORTEXR4_57_( void );
 void _coreEnableRamEcc_( void );
 void _coreDisableRamEcc_( void );
 void _mpuInit_( void );
+void _mpuDisable_( void );
 
 void tms570_emif_sdram_init( void );
 void tms570_memory_init( uint32_t ram );

@@ -173,20 +173,14 @@ tms570_bsp_pinmmr_config(const uint32_t *pinmmr_values, int reg_start, int reg_c
   cnt = reg_count;
 
   do {
-    *pinmmrx = *pinmmrx & *pval;
-    pinmmrx++;
-    pval++;
-  } while( --cnt );
-
-  pinmmrx = TMS570_PINMUX + reg_start;
-  pval = pinmmr_values;
-  cnt = reg_count;
-
-  do {
     *pinmmrx = *pval;
     pinmmrx++;
     pval++;
   } while( --cnt );
+
+  // TODO: This is LC43 only
+  TMS570_PINMUX[174] = (TMS570_PINMUX[174] & ~(0x3 << 8)) | (0x1 << 9); // emif output-enable bit8= 0, bit9= 1
+  TMS570_PINMUX[160] &= (1 << 24); // Set Ethernet to MII mode
 
   TMS570_IOMM.KICK_REG0 = 0;
   TMS570_IOMM.KICK_REG1 = 0;

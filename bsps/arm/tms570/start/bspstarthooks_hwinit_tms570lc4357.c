@@ -69,19 +69,22 @@ void tms570_pll_init( void )
   // Configure PLL control registers
 
   /**   - Setup pll control register 1:
-   *     - Setup reset on oscillator slip
-   *     - Setup bypass on pll slip
+   *     - Disable reset on oscillator slip (ROS)
+   *     - Enable bypass on pll slip
+   *        TODO: desired: switches to OSC when PLL slip detected
    *     - setup Pll output clock divider to max before Lock
-   *     - Setup reset on oscillator fail
+   *     - Disable reset on oscillator fail
    *     - Setup reference clock divider
    *     - Setup Pll multiplier
+   *
+   *     - PLL1: 16MHz OSC in -> 300MHz PLL1 out
    */
-  TMS570_SYS1.PLLCTL1 =  (uint32_t)0x00000000U
+  TMS570_SYS1.PLLCTL1 =  (TMS570_SYS1_PLLCTL1_ROS * 0)
                       |  (uint32_t)0x40000000U
-                      |  (uint32_t)((uint32_t)0x1FU << 24U)
-                      |  (uint32_t)0x00000000U
-                      |  (uint32_t)((uint32_t)(4U - 1U)<< 16U)
-                      |  (uint32_t)(0x4A00U);
+                      |  TMS570_SYS1_PLLCTL1_PLLDIV(0x1F)
+                      |  (TMS570_SYS1_PLLCTL1_ROF * 0)
+                      |  TMS570_SYS1_PLLCTL1_REFCLKDIV(4U - 1U)
+                      |  TMS570_SYS1_PLLCTL1_PLLMUL((75U - 1U) << 8);
 
   /**   - Setup pll control register 2
    *     - Setup spreading rate
@@ -102,10 +105,10 @@ void tms570_pll_init( void )
    *     - Setup internal Pll output divider
    *     - Setup Pll multiplier
    */
-  TMS570_SYS2.PLLCTL3 = ((uint32_t)(1U - 1U) << 29U)
-                      | ((uint32_t)0x1FU << 24U)
-                      | ((uint32_t)(8U - 1U)<< 16U)
-                      | (0x9500U);
+  TMS570_SYS2.PLLCTL3 = TMS570_SYS2_PLLCTL3_ODPLL2(1U - 1U)
+                      | TMS570_SYS2_PLLCTL3_PLLDIV2(0x1FU)
+                      | TMS570_SYS2_PLLCTL3_REFCLKDIV2(8U - 1U)
+                      | TMS570_SYS2_PLLCTL3_PLLMUL2(( 150U - 1U) << 8 );
 
   // Enable PLL(s) to start up or Lock
   // Enable all clock sources except the following
@@ -242,35 +245,39 @@ void tms570_map_clock_init( void )
     sys_csdis = TMS570_SYS1.CSDIS;
   }
 
-  TMS570_SYS1.GHVSRC =  ((uint32_t)TMS570_SYS_CLK_SRC_PLL1 << 24U)
-                      | ((uint32_t)TMS570_SYS_CLK_SRC_PLL1 << 16U)
-                      | ((uint32_t)TMS570_SYS_CLK_SRC_PLL1 << 0U);
+  TMS570_SYS1.GHVSRC =  TMS570_SYS1_GHVSRC_GHVWAKE(TMS570_SYS_CLK_SRC_PLL1)
+                      | TMS570_SYS1_GHVSRC_HVLPM(TMS570_SYS_CLK_SRC_PLL1)
+                      | TMS570_SYS1_GHVSRC_GHVSRC(TMS570_SYS_CLK_SRC_PLL1);
 
   /** - Setup RTICLK1 and RTICLK2 clocks */
   TMS570_SYS1.RCLKSRC = ((uint32_t)1U << 24U)        /* RTI2 divider (Not applicable for lock-step device)  */
-                      | ((uint32_t)TMS570_SYS_CLK_SRC_VCLK << 16U) /* RTI2 clock source (Not applicable for lock-step device) */
+                      | ((uint32_t)TMS570_SYS_CLK_SRC_VCLK << 16U) /* RTI2 clock source (Not applicable for lock-step device) Field not in TRM? */
                       | ((uint32_t)1U << 8U)         /* RTI1 divider */
                       | ((uint32_t)TMS570_SYS_CLK_SRC_VCLK << 0U); /* RTI1 clock source */
 
   /** - Setup asynchronous peripheral clock sources for AVCLK1 and AVCLK2 */
-  TMS570_SYS1.VCLKASRC =  ((uint32_t)TMS570_SYS_CLK_SRC_VCLK << 8U)
-                        | ((uint32_t)TMS570_SYS_CLK_SRC_VCLK << 0U);
+  TMS570_SYS1.VCLKASRC =  TMS570_SYS1_VCLKASRC_VCLKA2S(TMS570_SYS_CLK_SRC_VCLK)
+                        | TMS570_SYS1_VCLKASRC_VCLKA1S(TMS570_SYS_CLK_SRC_VCLK);
 
   /** - Setup synchronous peripheral clock dividers for VCLK1, VCLK2, VCLK3 */
-  TMS570_SYS1.CLKCNTL  = (TMS570_SYS1.CLKCNTL & 0xF0FFFFFFU)
-                        | ((uint32_t)1U << 24U);
-  TMS570_SYS1.CLKCNTL  = (TMS570_SYS1.CLKCNTL & 0xFFF0FFFFU)
-                        | ((uint32_t)1U << 16U);
 
-  TMS570_SYS2.CLK2CNTRL = (TMS570_SYS2.CLK2CNTRL & 0xFFFFFFF0U)
-                        | ((uint32_t)1U << 0U);
+  // VCLK2 = PLL1 / HCLK_DIV / 2 = 75MHz
+  TMS570_SYS1.CLKCNTL  = (TMS570_SYS1.CLKCNTL & ~TMS570_SYS1_CLKCNTL_VCLK2R(0xF))
+                        | TMS570_SYS1_CLKCNTL_VCLK2R(0x1);
+  // VLCK1 = PLL1 / HCLK_DIV / 2 = 75MHz
+  TMS570_SYS1.CLKCNTL  = (TMS570_SYS1.CLKCNTL & ~TMS570_SYS1_CLKCNTL_VCLKR(0xF))
+                        | TMS570_SYS1_CLKCNTL_VCLKR(0x1);
 
-  TMS570_SYS2.VCLKACON1 =   ((uint32_t)(1U - 1U) << 24U)
-                          | ((uint32_t)0U << 20U)
-                          | ((uint32_t)TMS570_SYS_CLK_SRC_VCLK << 16U)
-                          | ((uint32_t)(1U - 1U) << 8U)
-                          | ((uint32_t)0U << 4U)
-                          | ((uint32_t)TMS570_SYS_CLK_SRC_VCLK << 0U);
+  // VCLK3 = PLL1 / HCLK_DIV / 3 = 50MHz
+  TMS570_SYS2.CLK2CNTRL = (TMS570_SYS2.CLK2CNTRL & ~TMS570_SYS2_CLK2CNTRL_VCLK3R(0xF))
+                        | TMS570_SYS2_CLK2CNTRL_VCLK3R(0x2);
+
+  TMS570_SYS2.VCLKACON1 =   TMS570_SYS2_VCLKACON1_VCLKA4R(1U - 1U)
+                          | (TMS570_SYS2_VCLKACON1_VCLKA4_DIV_CDDIS * 0)
+                          | TMS570_SYS2_VCLKACON1_VCLKA4S(TMS570_SYS_CLK_SRC_VCLK)
+                          | TMS570_SYS2_VCLKACON1_VCLKA3R(1U - 1U)
+                          | (TMS570_SYS2_VCLKACON1_VCLKA3_DIV_CDDIS * 0)
+                          | TMS570_SYS2_VCLKACON1_VCLKA3S(TMS570_SYS_CLK_SRC_VCLK);
 
   /* Now the PLLs are locked and the PLL outputs can be sped up */
   /* The R-divider was programmed to be 0xF. Now this divider is changed to programmed value */
@@ -294,11 +301,13 @@ BSP_START_TEXT_SECTION void bsp_start_hook_0( void )
    * This function will initialize the entire CPU RAM and the corresponding ECC locations.
    */
   tms570_memory_init( 0x1U );
-  while (_errata_SSWF021_45_both_plls(10) != 0) {
+  int result = _errata_SSWF021_45_both_plls(10);
+  while (result != 0 && result != 4) {
     // (TM) TODO: proper error handling (run off oscillator instead of PLL?)
     for (int ii = INT32_MAX; ii > 0; ii--) {
       ;
     }
+    result = _errata_SSWF021_45_both_plls(10);
   }
 
   /* check for power-on reset condition */
@@ -548,6 +557,9 @@ BSP_START_TEXT_SECTION void bsp_start_hook_0( void )
   // (TM): see notes about not running _mpuInit_ below in bsp_start_hook_1
   // {TM) TODO: _cacheEnable_ currently causes boot failure
   // _cacheEnable_();
+
+  // configures and enables the ARM-core Memory Protection Unit (MPU)
+  _mpuInit_();
 
 #if 1
   /*
