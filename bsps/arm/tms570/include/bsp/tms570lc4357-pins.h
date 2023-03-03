@@ -980,7 +980,6 @@
 /* Default pinmux select */
 
 #define TMS570LC4357_PINMMR_DEFAULT_INIT_LIST(per_pin_action, common_arg) \
-  per_pin_action(common_arg, TMS570_BALL_N19_AD1EVT) \
   per_pin_action(common_arg, TMS570_BALL_D4_EMIF_ADDR_00) \
   per_pin_action(common_arg, TMS570_BALL_D5_EMIF_ADDR_01) \
   per_pin_action(common_arg, TMS570_BALL_C4_EMIF_ADDR_06) \
@@ -1113,12 +1112,27 @@
   per_pin_action(common_arg, TMS570_BALL_U7_MII_TX_CLK) \
   per_pin_action(common_arg, TMS570_BALL_E2_HET2_03) \
   per_pin_action(common_arg, TMS570_BALL_N3_HET2_07) \
-  per_pin_action(common_arg, TMS570_BALL_K3_EMIF_CLK)
-  // Note EMIF Clock enable (EMIF_CKE) on Ball L3 has no alternate functions and is enabled by default
-
+  per_pin_action(common_arg, TMS570_BALL_K3_EMIF_CLK) \
+  per_pin_action(common_arg, TMS570_BALL_N19_MII_RX_ER) \
+  per_pin_action(common_arg, TMS570_BALL_F3_MII_COL) \
+  per_pin_action(common_arg, TMS570_BALL_E18_MII_TXD_3) \
+  per_pin_action(common_arg, TMS570_BALL_R2_MII_TXD_2) \
+  per_pin_action(common_arg, TMS570_BALL_J19_MII_TXD_1) \
+  per_pin_action(common_arg, TMS570_BALL_J18_MII_TXD_0) \
+  per_pin_action(common_arg, TMS570_BALL_H19_MII_TXEN) \
+  per_pin_action(common_arg, TMS570_BALL_D19_MII_TX_CLK) \
+  per_pin_action(common_arg, TMS570_BALL_B4_MII_CRS) \
+  per_pin_action(common_arg, TMS570_BALL_K19_MII_RXCLK) \
+  per_pin_action(common_arg, TMS570_BALL_H18_MII_RXD_3) \
+  per_pin_action(common_arg, TMS570_BALL_G19_MII_RXD_2) \
+  per_pin_action(common_arg, TMS570_BALL_A14_MII_RXD_1) \
+  per_pin_action(common_arg, TMS570_BALL_P1_MII_RXD_0) \
+  per_pin_action(common_arg, TMS570_BALL_B11_MII_RX_DV) \
+  per_pin_action(common_arg, TMS570_BALL_G3_MDIO) \
+  per_pin_action(common_arg, TMS570_BALL_V5_MDCLK)
 
 /* End of default PINMMR list */
 
-// TODO: additional ethernet pins in PINMUX[89:91] that will need to be configured at some point to get ethernet working
+// Note EMIF Clock enable (EMIF_CKE) on Ball L3 has no alternate functions and is enabled by default
 
 #endif /*LIBBSP_ARM_TMS570_TMS570LC4357_PINS_H*/
