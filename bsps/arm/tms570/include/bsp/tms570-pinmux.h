@@ -71,6 +71,11 @@ void tms570_bsp_pin_config_one(uint32_t pin_num_and_fnc);
 
 void tms570_bsp_pinmmr_config(const uint32_t *pinmmr_values, int reg_start, int reg_count);
 
+/// Unlock PINMUX registers so they can be written to
+void tms570_bsp_pinmmr_unlock(void);
+/// Write-lock PINMUX registers
+void tms570_bsp_pinmmr_lock(void);
+
 static inline void
 tms570_bsp_pin_to_pinmmrx(volatile uint32_t **pinmmrx, unsigned int *pin_shift,
                           int pin_num)

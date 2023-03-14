@@ -12,8 +12,11 @@ install:
 - destination: ${BSP_INCLUDEDIR}/bsp/ti_herc
   source:
   - bsps/arm/tms570/include/bsp/ti_herc/errata_SSWF021_45.h
-links: []
+links:
+  - role: build-dependency
+    uid: objhwinittms570lc4357_hdk
 source:
+# Hardware Init (hwinit) sources common to all tms570lc4357-based boards
 - bsps/arm/tms570/start/bspstarthooks_hwinit_tms570lc4357.c
 - bsps/arm/tms570/start/errata_SSWF021_45.c
 type: build

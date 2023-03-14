@@ -112,8 +112,7 @@ tms570_bsp_pin_config_one(uint32_t pin_num_and_fnc)
 
   rtems_interrupt_disable(intlev);
 
-  TMS570_IOMM.KICK_REG0 = TMS570_BSP_IOMMR_KICK_KEY0;
-  TMS570_IOMM.KICK_REG1 = TMS570_BSP_IOMMR_KICK_KEY1;
+  tms570_bsp_pinmmr_unlock();
 
   pin_in_alt = pin_num_and_fnc & TMS570_PIN_IN_ALT_MASK;
   if ( pin_in_alt ) {
@@ -132,8 +131,7 @@ tms570_bsp_pin_config_one(uint32_t pin_num_and_fnc)
     tms570_bsp_pin_set_function(pin_num_and_fnc, TMS570_PIN_FNC_AUTO);
   }
 
-  TMS570_IOMM.KICK_REG0 = 0;
-  TMS570_IOMM.KICK_REG1 = 0;
+  tms570_bsp_pinmmr_lock();
 
   rtems_interrupt_enable(intlev);
 }
@@ -165,8 +163,7 @@ tms570_bsp_pinmmr_config(const uint32_t *pinmmr_values, int reg_start, int reg_c
   if ( reg_count <= 0)
     return;
 
-  TMS570_IOMM.KICK_REG0 = TMS570_BSP_IOMMR_KICK_KEY0;
-  TMS570_IOMM.KICK_REG1 = TMS570_BSP_IOMMR_KICK_KEY1;
+  tms570_bsp_pinmmr_unlock();
 
   pinmmrx = TMS570_PINMUX + reg_start;
   pval = pinmmr_values;
@@ -178,10 +175,15 @@ tms570_bsp_pinmmr_config(const uint32_t *pinmmr_values, int reg_start, int reg_c
     pval++;
   } while( --cnt );
 
-  // TODO: This is LC43 only
-  TMS570_PINMUX[174] = (TMS570_PINMUX[174] & ~(0x3 << 8)) | (0x1 << 9); // emif output-enable bit8= 0, bit9= 1
-  TMS570_PINMUX[160] &= ~(1 << 24); // Set Ethernet to MII mode
+  tms570_bsp_pinmmr_lock();
+}
 
+void tms570_bsp_pinmmr_unlock(void) {
+  TMS570_IOMM.KICK_REG0 = TMS570_BSP_IOMMR_KICK_KEY0;
+  TMS570_IOMM.KICK_REG1 = TMS570_BSP_IOMMR_KICK_KEY1;
+}
+
+void tms570_bsp_pinmmr_lock(void) {
   TMS570_IOMM.KICK_REG0 = 0;
   TMS570_IOMM.KICK_REG1 = 0;
 }
