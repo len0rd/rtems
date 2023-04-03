@@ -178,6 +178,9 @@ BSP_START_TEXT_SECTION void bsp_start_hook_1( void )
   }
 #endif
 
+  rtems_cache_enable_instruction();
+  rtems_cache_enable_data();
+
   bsp_start_copy_sections();
   bsp_start_clear_bss();
 }

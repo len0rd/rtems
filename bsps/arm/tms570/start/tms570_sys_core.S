@@ -820,3 +820,32 @@ r13Base:  .word 0x00000000
 r14Base:  .word 0x00000000  
 r15Base:  .word 0x00000000  
 r16Base:  .word 0xFFF80000  
+
+/*-------------------------------------------------------------------------------*/
+@ Initialize RAM
+
+    .weak _ramInit_
+    .type _ramInit_, %function
+
+_ramInit_:
+        ldr   r12, MINITGCR     @Load MINITGCR register address
+        mov   r4, #0xA
+        str   r4, [r12]         @Enable global memory hardware initialization
+
+        ldr   r11,  MSIENA      @Load MSIENA register address
+        mov   r4, #0x1          @Bit position 0 of MSIENA corresponds to SRAM
+        str   r4, [r11]         @Enable auto hardware initalisation for SRAM
+mloop:                          @Loop till memory hardware initialization comletes
+        ldr   r5, MSTCGSTAT
+        ldr   r4, [r5]
+        tst   r4, #0x100
+        beq   mloop
+
+        mov   r4, #5
+        str   r4, [r12]         @Disable global memory hardware initialization
+        bx lr
+
+
+MINITGCR:   .word 0xFFFFFF5C
+MSIENA:     .word 0xFFFFFF60
+MSTCGSTAT:  .word 0xFFFFFF68

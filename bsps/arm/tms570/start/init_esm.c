@@ -35,9 +35,11 @@ void tms570_esm_init( void )
   TMS570_ESM.LTCPR = 16384U - 1U;
 
   /** - Reset error pin */
+  // Per TMS570LC43 Errata DEVICE#60
+  // The error pin cannot be cleared with a normal EKR write upon system reset
+  // Put in diagnostic followed by normal mode instead
   if (TMS570_ESM.EPSR == 0U) {
-    TMS570_ESM.EKR = 0x00000005U;
-  } else {
+    TMS570_ESM.EKR = 0x0000000AU;
     TMS570_ESM.EKR = 0x00000000U;
   }
 

@@ -124,7 +124,9 @@ void tms570_periph_init( void )
 
 #define PBIST_March13N_SP        0x00000008U  /**< March13 N Algo for 1 Port mem */
 
-BSP_START_TEXT_SECTION void bsp_start_hook_0( void )
+// NOTE: the _ramInit_() RAM + RAM-ECC initialization function appears to wipe r7 (Frame Pointer)
+// Therefore stack-allocated variables are not safe in this method unless the gcc __attribute__((naked)) is defined
+BSP_START_TEXT_SECTION __attribute__((naked)) void bsp_start_hook_0( void )
 {
    /*
    * Initialize CPU RAM.
@@ -133,64 +135,68 @@ BSP_START_TEXT_SECTION void bsp_start_hook_0( void )
    * Hence the value 0x1 passed to the function.
    * This function will initialize the entire CPU RAM and the corresponding ECC locations.
    */
-  tms570_memory_init( 0x1U );
-  int result = _errata_SSWF021_45_both_plls(10);
-  while (result != 0 && result != 4) {
-    // (TM) TODO: proper error handling (run off oscillator instead of PLL?)
-    for (int ii = INT32_MAX; ii > 0; ii--) {
-      ;
-    }
-    result = _errata_SSWF021_45_both_plls(10);
+  _ramInit_();
+  int pll_result = _errata_SSWF021_45_both_plls(10);
+  while (pll_result != 0 && pll_result != 4)
+  {
+    pll_result = _errata_SSWF021_45_both_plls(10);
   }
 
-  /* check for power-on reset condition */
-  /*SAFETYMCUSW 139 S MR:13.7 <APPROVED> "Hardware status bit read check" */
-  if ( ( TMS570_SYS1.SYSESR & TMS570_SYS1_SYSESR_PORST ) != 0U ) {
-    /* clear all reset status flags */
-    TMS570_SYS1.SYSESR = 0xFFFFU;
+  _coreEnableEventBusExport_();
 
+  tms570_esr_reset_source_t rst_source;
+  /* check for power-on reset condition */
+  if ( ( TMS570_SYS1.SYSESR & TMS570_ESR_RSTSRC_POWERON_RESET ) != 0U )
+  {
+    rst_source = TMS570_ESR_RSTSRC_POWERON_RESET;
     /* continue with normal start-up sequence */
   }
-  /*SAFETYMCUSW 139 S MR:13.7 <APPROVED> "Hardware status bit read check" */
-  else if ( ( TMS570_SYS1.SYSESR & TMS570_SYS1_SYSESR_OSCRST ) != 0U ) {
-    /* Reset caused due to oscillator failure.
-       Add user code here to handle oscillator failure */
-  }
-  /*SAFETYMCUSW 139 S MR:13.7 <APPROVED> "Hardware status bit read check" */
-  else if ( ( TMS570_SYS1.SYSESR & TMS570_SYS1_SYSESR_WDRST ) != 0U ) {
-    /* Reset caused due
-     *  1) windowed watchdog violation - Add user code here to handle watchdog violation.
-     *  2) ICEPICK Reset - After loading code via CCS / System Reset through CCS
-     */
-    /* Check the WatchDog Status register */
-    if ( TMS570_RTI.WDSTATUS != 0U ) {
-      /* Add user code here to handle watchdog violation. */
-      /* Clear the Watchdog reset flag in Exception Status register */
-      TMS570_SYS1.SYSESR = TMS570_SYS1_SYSESR_WDRST;
-    } else {
-      /* Clear the ICEPICK reset flag in Exception Status register */
-      TMS570_SYS1.SYSESR = TMS570_SYS1_SYSESR_WDRST;
+  else if ((TMS570_SYS1.SYSESR & (uint32_t)TMS570_ESR_RSTSRC_EXT_RESET) != 0U)
+  {
+    /*** Check for other causes of EXT_RESET that would take precedence **/
+    if ((TMS570_SYS1.SYSESR & (uint32_t)TMS570_ESR_RSTSRC_OSC_FAILURE_RESET) != 0U)
+    {
+      /* Reset caused due to oscillator failure. */
+      /// TODO: add user code here to handle oscillator failure
+      /// NOTE: action taken when an OSC fail/PLL slip is detected is configured in PLLCTL1
+      rst_source = TMS570_ESR_RSTSRC_OSC_FAILURE_RESET;
+    }
+    else if ((TMS570_SYS1.SYSESR & (uint32_t)TMS570_ESR_RSTSRC_WATCHDOG_RESET) != 0U)
+    {
+      /* Reset caused due watchdog violation */
+      /// TODO: if TMS570_RTI.WDSTATUS != 0U then a watchdog violation has occurred. handle accordingly!
+      rst_source = TMS570_ESR_RSTSRC_WATCHDOG_RESET;
+    }
+    else if ((TMS570_SYS1.SYSESR & (uint32_t)TMS570_ESR_RSTSRC_SW_RESET) != 0U)
+    {
+      /* Reset caused due to software reset. */
+      rst_source = TMS570_ESR_RSTSRC_SW_RESET;
+    }
+    else if ((TMS570_SYS1.SYSESR & (uint32_t)TMS570_ESR_RSTSRC_DEBUG_RESET) != 0U)
+    {
+      /* Reset caused due Debug reset request */
+      rst_source = TMS570_ESR_RSTSRC_DEBUG_RESET;
+    }
+    else
+    {
+      /* Reset caused due to External reset. */
+      rst_source = TMS570_ESR_RSTSRC_EXT_RESET;
     }
   }
-  /*SAFETYMCUSW 139 S MR:13.7 <APPROVED> "Hardware status bit read check" */
-  else if ( ( TMS570_SYS1.SYSESR & TMS570_SYS1_SYSESR_CPURST ) != 0U ) {
+  else if ((TMS570_SYS1.SYSESR & TMS570_ESR_RSTSRC_CPU0_RESET) != 0U)
+  {
     /* Reset caused due to CPU reset.
        CPU reset can be caused by CPU self-test completion, or
        by toggling the "CPU RESET" bit of the CPU Reset Control Register. */
 
     /* clear all reset status flags */
-    TMS570_SYS1.SYSESR = TMS570_SYS1_SYSESR_CPURST;
+    rst_source = TMS570_ESR_RSTSRC_CPU0_RESET;
   }
-  /*SAFETYMCUSW 139 S MR:13.7 <APPROVED> "Hardware status bit read check" */
-  else if ( ( TMS570_SYS1.SYSESR & TMS570_SYS1_SYSESR_SWRST ) != 0U ) {
-    /* Reset caused due to software reset.
-       Add user code to handle software reset. */
-  } else {
-    /* Reset caused by nRST being driven low externally.
-       Add user code to handle external reset. */
+  else
+  {
+    /* No_reset occurred. */
+      rst_source = TMS570_ESR_RSTSRC_NO_RESET;
   }
-
-  _coreEnableEventBusExport_();
 
   /*
    * Check if there were ESM group3 errors during power-up.
@@ -200,12 +206,18 @@ BSP_START_TEXT_SECTION void bsp_start_hook_0( void )
    * An ESM group3 error only drives the nERROR pin low. An external circuit
    * that monitors the nERROR pin must take the appropriate action to ensure that
    * the system is placed in a safe state, as determined by the application.
+   * NOTE: during code-loading/debug-resets SR[2][4] may get set (indicates double ECC error in internal RAM)
+   *       ignore for now as its resolved with ESM init/reset below
    */
-  if ( ( TMS570_ESM.SR[ 2 ] ) != 0U ) {
+  if (rst_source != TMS570_ESR_RSTSRC_DEBUG_RESET && (TMS570_ESM.SR[2]) != 0U) {
     /*SAFETYMCUSW 28 D MR:NA <APPROVED> "for(;;) can be removed by adding "# if 0" and "# endif" in the user codes above and below" */
+    /// TODO: proper handling/reporting of any Group3 errors on bootup 
     for (;; ) {
     }           /* Wait */
   }
+
+  /* clear all reset status flags */
+  TMS570_SYS1.SYSESR = 0xFFFFU;
 
   /* Initialize System - Clock, Flash settings with Efuse self check */
   tms570_system_hw_init();
@@ -386,10 +398,6 @@ BSP_START_TEXT_SECTION void bsp_start_hook_0( void )
 
   /* Configure system response to error conditions signaled to the ESM group1 */
   tms570_esm_init();
-
-  // (TM): see notes about not running _mpuInit_ below in bsp_start_hook_1
-  // {TM) TODO: _cacheEnable_ currently causes boot failure
-  // _cacheEnable_();
 
   // configures and enables the ARM-core Memory Protection Unit (MPU)
   _mpuInit_();
