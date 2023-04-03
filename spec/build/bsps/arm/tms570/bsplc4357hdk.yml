@@ -16,7 +16,7 @@ links:
 - role: build-dependency
   uid: ../../tstsmallmem
 - role: build-dependency
-  uid: opttms570lc4357
+  uid: opttms570lc4357_hdk
 - role: build-dependency
   uid: grp
 source: []

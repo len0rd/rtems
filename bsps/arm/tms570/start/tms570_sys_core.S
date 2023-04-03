@@ -640,13 +640,13 @@ _mpuInit_:
         mcr   p15, #0,    r0, c6, c1, #4
         movw  r0,  #((0 << 15) + (0 << 14) + (0 << 13) + (0 << 12) + (0 << 11) + (0 << 10) + (0 <<  9) + (0 <<  8) + (0x15 << 1) + (1))
         mcr   p15, #0,    r0, c6, c1, #2
-        @ Setup region  
+        @ Setup region 3 - Internal RAM
         mov   r0,  #2
         mcr   p15, #0,    r0, c6, c2, #0
         ldr   r0,  r3Base
         mcr   p15, #0,    r0, c6, c1, #0    
         mov   r0,  #0x000B
-        orr   r0,  r0,    #0x1300
+        orr   r0,  r0,    #0x0300
         mcr   p15, #0,    r0, c6, c1, #4
         movw  r0,  #((0 << 15) + (0 << 14) + (0 << 13) + (0 << 12) + (0 << 11) + (0 << 10) + (0 <<  9) + (0 <<  8) + (0x12 << 1) + (1))
         mcr   p15, #0,    r0, c6, c1, #2
@@ -670,7 +670,7 @@ _mpuInit_:
         mcr   p15, #0,    r0, c6, c1, #4
         movw  r0,  #((1 << 15) + (1 << 14) + (0 << 13) + (0 << 12) + (0 << 11) + (0 << 10) + (0 <<  9) + (0 <<  8) + (0x1B << 1) + (1))
         mcr   p15, #0,    r0, c6, c1, #2
-        @ Setup region 6
+        @ Setup region 6 - EMIF CS0 == External SDRAM
         mov   r0,  #5
         mcr   p15, #0,    r0, c6, c2, #0
         ldr   r0,  r6Base
@@ -789,6 +789,21 @@ _mpuInit_:
         isb
         bx    lr
 
+/*-------------------------------------------------------------------------------*/
+@ Disable Mpu
+
+    .weak     _mpuDisable_
+    .type     _mpuDisable_, %function	
+    
+_mpuDisable_:
+
+        mrc   p15, #0, r0, c1, c0, #0
+        bic   r0,  r0, #1
+        dsb
+        mcr   p15, #0, r0, c1, c0, #0
+        isb
+        bx    lr
+
 r1Base:  .word 0x00000000  
 r2Base:  .word 0x00000000  
 r3Base:  .word 0x08000000  
@@ -805,3 +820,32 @@ r13Base:  .word 0x00000000
 r14Base:  .word 0x00000000  
 r15Base:  .word 0x00000000  
 r16Base:  .word 0xFFF80000  
+
+/*-------------------------------------------------------------------------------*/
+@ Initialize RAM
+
+    .weak _ramInit_
+    .type _ramInit_, %function
+
+_ramInit_:
+        ldr   r12, MINITGCR     @Load MINITGCR register address
+        mov   r4, #0xA
+        str   r4, [r12]         @Enable global memory hardware initialization
+
+        ldr   r11,  MSIENA      @Load MSIENA register address
+        mov   r4, #0x1          @Bit position 0 of MSIENA corresponds to SRAM
+        str   r4, [r11]         @Enable auto hardware initalisation for SRAM
+mloop:                          @Loop till memory hardware initialization comletes
+        ldr   r5, MSTCGSTAT
+        ldr   r4, [r5]
+        tst   r4, #0x100
+        beq   mloop
+
+        mov   r4, #5
+        str   r4, [r12]         @Disable global memory hardware initialization
+        bx lr
+
+
+MINITGCR:   .word 0xFFFFFF5C
+MSIENA:     .word 0xFFFFFF60
+MSTCGSTAT:  .word 0xFFFFFF68

@@ -89,6 +89,11 @@ void tms570_system_hw_init( void )
   /** - Configure the LPO such that HF LPO is as close to 10MHz as possible */
   tms570_trim_lpo_init();
 
+  /// (TM) Per Errata EMIF#5 on the LC4357B, emif sdram should be configured when the clock
+  ///   rate is still <40Mhz (ie: when running off OSC before switching to PLL). So this method should
+  ///   be getting called BEFORE tms570_map_clock_init is called
+  tms570_emif_sdram_init();
+
   /** - Wait for PLLs to start up and map clock domains to desired clock sources */
   tms570_map_clock_init();
 
@@ -173,10 +178,8 @@ BSP_START_TEXT_SECTION void bsp_start_hook_1( void )
   }
 #endif
 
-  /// (TM) TODO: Per Errata EMIF#5 on the LC4357B, emif sdram should be configured when the clock
-  ///   rate is still <40Mhz (ie: when running off OSC before switching to PLL). So this method should
-  ///   be getting called BEFORE tms570_map_clock_init is called
-  tms570_emif_sdram_init();
+  rtems_cache_enable_instruction();
+  rtems_cache_enable_data();
 
   bsp_start_copy_sections();
   bsp_start_clear_bss();

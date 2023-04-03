@@ -36,81 +36,6 @@
 #include <bsp/tms570_selftest_parity.h>
 #include <bsp/start.h>
 
-typedef enum Tms570ClockSources {
-  TMS570_CLK_SRC_OSC  = 0x01, ///< External high-speed oscillator as clock source
-  TMS570_CLK_SRC_PLL1 = 0x02, 
-  TMS570_CLK_SRC_RESERVED = 0x04, ///< reserved. not tied to actual clock source
-  TMS570_CLK_SRC_EXT_CLK1 = 0x08, 
-  TMS570_CLK_SRC_LOW_FREQ_LPO = 0x10, 
-  TMS570_CLK_SRC_HIGH_FREQ_LPO = 0x20, 
-  TMS570_CLK_SRC_PLL2 = 0x40, 
-  TMS570_CLK_SRC_EXT_CLK2 = 0x80, 
-};
-
-/**
- * @brief Setup all system PLLs (HCG:setupPLL)
- *
- */
-void tms570_pll_init( void )
-{
-  uint32_t pll12_dis = TMS570_CLK_SRC_PLL1 | TMS570_CLK_SRC_PLL2;
-
-  /* Disable PLL1 and PLL2 */
-  TMS570_SYS1.CSDISSET = pll12_dis;
-
-  /*SAFETYMCUSW 28 D MR:NA <APPROVED> "Hardware status bit read check" */
-  while ( ( TMS570_SYS1.CSDIS & pll12_dis ) != pll12_dis ) {
-    /* Wait */
-  }
-
-  /* Clear Global Status Register */
-  TMS570_SYS1.GLBSTAT = 0x301U;
-
-  // Configure PLL control registers
-
-  /**   - Setup pll control register 1:
-   *     - Setup reset on oscillator slip
-   *     - Setup bypass on pll slip
-   *     - setup Pll output clock divider to max before Lock
-   *     - Setup reset on oscillator fail
-   *     - Setup reference clock divider
-   *     - Setup Pll multiplier
-   */
-  TMS570_SYS1.PLLCTL1 =  (uint32_t)0x00000000U
-                      |  (uint32_t)0x40000000U
-                      |  (uint32_t)((uint32_t)0x1FU << 24U)
-                      |  (uint32_t)0x00000000U
-                      |  (uint32_t)((uint32_t)(4U - 1U)<< 16U)
-                      |  (uint32_t)(0x4A00U);
-
-  /**   - Setup pll control register 2
-   *     - Setup spreading rate
-   *     - Setup bandwidth adjustment
-   *     - Setup internal Pll output divider
-   *     - Setup spreading amount
-   */
-  TMS570_SYS1.PLLCTL2 =  ((uint32_t)255U << 22U)
-                      |  ((uint32_t)7U << 12U)
-                      |  ((uint32_t)(1U - 1U) << 9U)
-                      |  61U;
-
-  // Initialize Pll2
-
-  /**   - Setup pll2 control register :
-   *     - setup Pll output clock divider to max before Lock
-   *     - Setup reference clock divider
-   *     - Setup internal Pll output divider
-   *     - Setup Pll multiplier
-   */
-  TMS570_SYS2.PLLCTL3 = ((uint32_t)(1U - 1U) << 29U)
-                      | ((uint32_t)0x1FU << 24U)
-                      | ((uint32_t)(8U - 1U)<< 16U)
-                      | (0x9500U);
-
-  // Enable PLL(s) to start up or Lock
-  // Enable all clock sources except the following
-  TMS570_SYS1.CSDIS = (TMS570_CLK_SRC_EXT_CLK2 | TMS570_CLK_SRC_EXT_CLK1 | TMS570_CLK_SRC_RESERVED);
-}
 
 /**
  * @brief Adjust Low-Frequency (LPO) oscillator (HCG:trimLPO)
@@ -135,17 +60,6 @@ enum tms570_flash_power_modes {
   TMS570_FLASH_SYS_SLEEP = 0U,     /**< Alias for flash bank power mode sleep   */
   TMS570_FLASH_SYS_STANDBY = 1U,   /**< Alias for flash bank power mode standby */
   TMS570_FLASH_SYS_ACTIVE = 3U     /**< Alias for flash bank power mode active  */
-};
-
-enum tms570_system_clock_source {
-  TMS570_SYS_CLK_SRC_OSC = 0U,          /**< Alias for oscillator clock Source                */
-  TMS570_SYS_CLK_SRC_PLL1 = 1U,         /**< Alias for Pll1 clock Source                      */
-  TMS570_SYS_CLK_SRC_EXTERNAL1 = 3U,    /**< Alias for external clock Source                  */
-  TMS570_SYS_CLK_SRC_LPO_LOW = 4U,      /**< Alias for low power oscillator low clock Source  */
-  TMS570_SYS_CLK_SRC_LPO_HIGH = 5U,     /**< Alias for low power oscillator high clock Source */
-  TMS570_SYS_CLK_SRC_PLL2 = 6U,         /**< Alias for Pll2 clock Source                      */
-  TMS570_SYS_CLK_SRC_EXTERNAL2 = 7U,    /**< Alias for external 2 clock Source                */
-  TMS570_SYS_CLK_SRC_VCLK = 9U          /**< Alias for synchronous VCLK1 clock Source         */
 };
 
 /**
@@ -208,83 +122,11 @@ void tms570_periph_init( void )
   TMS570_SYS1.CLKCNTL |= TMS570_SYS1_CLKCNTL_PENA;
 }
 
-/**
- * @brief Setup chip clocks including to wait for PLLs locks (HCG:mapClocks)
- *
- */
-/* SourceId : SYSTEM_SourceId_005 */
-/* DesignId : SYSTEM_DesignId_005 */
-/* Requirements : HL_SR469 */
-void tms570_map_clock_init( void )
-{
-  uint32_t sys_csvstat, sys_csdis;
-
-  TMS570_SYS2.HCLKCNTL = 1U;
-
-  /** @b Initialize @b Clock @b Tree: */
-  /** - Disable / Enable clock domain */
-  TMS570_SYS1.CDDIS = ( 0U << 4U ) |  /* AVCLK 1 ON */
-                      ( 1U << 5U ) |  /* AVCLK 2 OFF */
-                      ( 0U << 8U ) |  /* VCLK3 ON */
-                      ( 0U << 9U ) |  /* VCLK4 ON */
-                      ( 0U << 10U ) | /* AVCLK 3 ON */
-                      ( 0U << 11U );  /* AVCLK 4 ON */
-
-  /* Work Around for Errata SYS#46:
-   * Despite this being a LS3137 errata, hardware testing on the LC4357 indicates this wait is still necessary
-   */
-  sys_csvstat = TMS570_SYS1.CSVSTAT;
-  sys_csdis = TMS570_SYS1.CSDIS;
-
-  while ( ( sys_csvstat & ( ( sys_csdis ^ 0xFFU ) & 0xFFU ) ) !=
-          ( ( sys_csdis ^ 0xFFU ) & 0xFFU ) ) {
-    sys_csvstat = TMS570_SYS1.CSVSTAT;
-    sys_csdis = TMS570_SYS1.CSDIS;
-  }
-
-  TMS570_SYS1.GHVSRC =  ((uint32_t)TMS570_SYS_CLK_SRC_PLL1 << 24U)
-                      | ((uint32_t)TMS570_SYS_CLK_SRC_PLL1 << 16U)
-                      | ((uint32_t)TMS570_SYS_CLK_SRC_PLL1 << 0U);
-
-  /** - Setup RTICLK1 and RTICLK2 clocks */
-  TMS570_SYS1.RCLKSRC = ((uint32_t)1U << 24U)        /* RTI2 divider (Not applicable for lock-step device)  */
-                      | ((uint32_t)TMS570_SYS_CLK_SRC_VCLK << 16U) /* RTI2 clock source (Not applicable for lock-step device) */
-                      | ((uint32_t)1U << 8U)         /* RTI1 divider */
-                      | ((uint32_t)TMS570_SYS_CLK_SRC_VCLK << 0U); /* RTI1 clock source */
-
-  /** - Setup asynchronous peripheral clock sources for AVCLK1 and AVCLK2 */
-  TMS570_SYS1.VCLKASRC =  ((uint32_t)TMS570_SYS_CLK_SRC_VCLK << 8U)
-                        | ((uint32_t)TMS570_SYS_CLK_SRC_VCLK << 0U);
-
-  /** - Setup synchronous peripheral clock dividers for VCLK1, VCLK2, VCLK3 */
-  TMS570_SYS1.CLKCNTL  = (TMS570_SYS1.CLKCNTL & 0xF0FFFFFFU)
-                        | ((uint32_t)1U << 24U);
-  TMS570_SYS1.CLKCNTL  = (TMS570_SYS1.CLKCNTL & 0xFFF0FFFFU)
-                        | ((uint32_t)1U << 16U);
-
-  TMS570_SYS2.CLK2CNTRL = (TMS570_SYS2.CLK2CNTRL & 0xFFFFFFF0U)
-                        | ((uint32_t)1U << 0U);
-
-  TMS570_SYS2.VCLKACON1 =   ((uint32_t)(1U - 1U) << 24U)
-                          | ((uint32_t)0U << 20U)
-                          | ((uint32_t)TMS570_SYS_CLK_SRC_VCLK << 16U)
-                          | ((uint32_t)(1U - 1U) << 8U)
-                          | ((uint32_t)0U << 4U)
-                          | ((uint32_t)TMS570_SYS_CLK_SRC_VCLK << 0U);
-
-  /* Now the PLLs are locked and the PLL outputs can be sped up */
-  /* The R-divider was programmed to be 0xF. Now this divider is changed to programmed value */
-  TMS570_SYS1.PLLCTL1 = (TMS570_SYS1.PLLCTL1 & 0xE0FFFFFFU) | (uint32_t)((uint32_t)(1U - 1U) << 24U);
-  /*SAFETYMCUSW 134 S MR:12.2 <APPROVED> " Clear and write to the volatile register " */
-  TMS570_SYS2.PLLCTL3 = (TMS570_SYS2.PLLCTL3 & 0xE0FFFFFFU) | (uint32_t)((uint32_t)(1U - 1U) << 24U);
-
-  /* Enable/Disable Frequency modulation */
-  TMS570_SYS1.PLLCTL2 |= 0x00000000U;
-}
-
 #define PBIST_March13N_SP        0x00000008U  /**< March13 N Algo for 1 Port mem */
 
-BSP_START_TEXT_SECTION void bsp_start_hook_0( void )
+// NOTE: the _ramInit_() RAM + RAM-ECC initialization function appears to wipe r7 (Frame Pointer)
+// Therefore stack-allocated variables are not safe in this method unless the gcc __attribute__((naked)) is defined
+BSP_START_TEXT_SECTION __attribute__((naked)) void bsp_start_hook_0( void )
 {
    /*
    * Initialize CPU RAM.
@@ -293,62 +135,68 @@ BSP_START_TEXT_SECTION void bsp_start_hook_0( void )
    * Hence the value 0x1 passed to the function.
    * This function will initialize the entire CPU RAM and the corresponding ECC locations.
    */
-  tms570_memory_init( 0x1U );
-  while (_errata_SSWF021_45_both_plls(10) != 0) {
-    // (TM) TODO: proper error handling (run off oscillator instead of PLL?)
-    for (int ii = INT32_MAX; ii > 0; ii--) {
-      ;
-    }
+  _ramInit_();
+  int pll_result = _errata_SSWF021_45_both_plls(10);
+  while (pll_result != 0 && pll_result != 4)
+  {
+    pll_result = _errata_SSWF021_45_both_plls(10);
   }
 
-  /* check for power-on reset condition */
-  /*SAFETYMCUSW 139 S MR:13.7 <APPROVED> "Hardware status bit read check" */
-  if ( ( TMS570_SYS1.SYSESR & TMS570_SYS1_SYSESR_PORST ) != 0U ) {
-    /* clear all reset status flags */
-    TMS570_SYS1.SYSESR = 0xFFFFU;
+  _coreEnableEventBusExport_();
 
+  tms570_esr_reset_source_t rst_source;
+  /* check for power-on reset condition */
+  if ( ( TMS570_SYS1.SYSESR & TMS570_ESR_RSTSRC_POWERON_RESET ) != 0U )
+  {
+    rst_source = TMS570_ESR_RSTSRC_POWERON_RESET;
     /* continue with normal start-up sequence */
   }
-  /*SAFETYMCUSW 139 S MR:13.7 <APPROVED> "Hardware status bit read check" */
-  else if ( ( TMS570_SYS1.SYSESR & TMS570_SYS1_SYSESR_OSCRST ) != 0U ) {
-    /* Reset caused due to oscillator failure.
-       Add user code here to handle oscillator failure */
-  }
-  /*SAFETYMCUSW 139 S MR:13.7 <APPROVED> "Hardware status bit read check" */
-  else if ( ( TMS570_SYS1.SYSESR & TMS570_SYS1_SYSESR_WDRST ) != 0U ) {
-    /* Reset caused due
-     *  1) windowed watchdog violation - Add user code here to handle watchdog violation.
-     *  2) ICEPICK Reset - After loading code via CCS / System Reset through CCS
-     */
-    /* Check the WatchDog Status register */
-    if ( TMS570_RTI.WDSTATUS != 0U ) {
-      /* Add user code here to handle watchdog violation. */
-      /* Clear the Watchdog reset flag in Exception Status register */
-      TMS570_SYS1.SYSESR = TMS570_SYS1_SYSESR_WDRST;
-    } else {
-      /* Clear the ICEPICK reset flag in Exception Status register */
-      TMS570_SYS1.SYSESR = TMS570_SYS1_SYSESR_WDRST;
+  else if ((TMS570_SYS1.SYSESR & (uint32_t)TMS570_ESR_RSTSRC_EXT_RESET) != 0U)
+  {
+    /*** Check for other causes of EXT_RESET that would take precedence **/
+    if ((TMS570_SYS1.SYSESR & (uint32_t)TMS570_ESR_RSTSRC_OSC_FAILURE_RESET) != 0U)
+    {
+      /* Reset caused due to oscillator failure. */
+      /// TODO: add user code here to handle oscillator failure
+      /// NOTE: action taken when an OSC fail/PLL slip is detected is configured in PLLCTL1
+      rst_source = TMS570_ESR_RSTSRC_OSC_FAILURE_RESET;
+    }
+    else if ((TMS570_SYS1.SYSESR & (uint32_t)TMS570_ESR_RSTSRC_WATCHDOG_RESET) != 0U)
+    {
+      /* Reset caused due watchdog violation */
+      /// TODO: if TMS570_RTI.WDSTATUS != 0U then a watchdog violation has occurred. handle accordingly!
+      rst_source = TMS570_ESR_RSTSRC_WATCHDOG_RESET;
+    }
+    else if ((TMS570_SYS1.SYSESR & (uint32_t)TMS570_ESR_RSTSRC_SW_RESET) != 0U)
+    {
+      /* Reset caused due to software reset. */
+      rst_source = TMS570_ESR_RSTSRC_SW_RESET;
+    }
+    else if ((TMS570_SYS1.SYSESR & (uint32_t)TMS570_ESR_RSTSRC_DEBUG_RESET) != 0U)
+    {
+      /* Reset caused due Debug reset request */
+      rst_source = TMS570_ESR_RSTSRC_DEBUG_RESET;
+    }
+    else
+    {
+      /* Reset caused due to External reset. */
+      rst_source = TMS570_ESR_RSTSRC_EXT_RESET;
     }
   }
-  /*SAFETYMCUSW 139 S MR:13.7 <APPROVED> "Hardware status bit read check" */
-  else if ( ( TMS570_SYS1.SYSESR & TMS570_SYS1_SYSESR_CPURST ) != 0U ) {
+  else if ((TMS570_SYS1.SYSESR & TMS570_ESR_RSTSRC_CPU0_RESET) != 0U)
+  {
     /* Reset caused due to CPU reset.
        CPU reset can be caused by CPU self-test completion, or
        by toggling the "CPU RESET" bit of the CPU Reset Control Register. */
 
     /* clear all reset status flags */
-    TMS570_SYS1.SYSESR = TMS570_SYS1_SYSESR_CPURST;
+    rst_source = TMS570_ESR_RSTSRC_CPU0_RESET;
   }
-  /*SAFETYMCUSW 139 S MR:13.7 <APPROVED> "Hardware status bit read check" */
-  else if ( ( TMS570_SYS1.SYSESR & TMS570_SYS1_SYSESR_SWRST ) != 0U ) {
-    /* Reset caused due to software reset.
-       Add user code to handle software reset. */
-  } else {
-    /* Reset caused by nRST being driven low externally.
-       Add user code to handle external reset. */
+  else
+  {
+    /* No_reset occurred. */
+      rst_source = TMS570_ESR_RSTSRC_NO_RESET;
   }
-
-  _coreEnableEventBusExport_();
 
   /*
    * Check if there were ESM group3 errors during power-up.
@@ -358,12 +206,18 @@ BSP_START_TEXT_SECTION void bsp_start_hook_0( void )
    * An ESM group3 error only drives the nERROR pin low. An external circuit
    * that monitors the nERROR pin must take the appropriate action to ensure that
    * the system is placed in a safe state, as determined by the application.
+   * NOTE: during code-loading/debug-resets SR[2][4] may get set (indicates double ECC error in internal RAM)
+   *       ignore for now as its resolved with ESM init/reset below
    */
-  if ( ( TMS570_ESM.SR[ 2 ] ) != 0U ) {
+  if (rst_source != TMS570_ESR_RSTSRC_DEBUG_RESET && (TMS570_ESM.SR[2]) != 0U) {
     /*SAFETYMCUSW 28 D MR:NA <APPROVED> "for(;;) can be removed by adding "# if 0" and "# endif" in the user codes above and below" */
+    /// TODO: proper handling/reporting of any Group3 errors on bootup 
     for (;; ) {
     }           /* Wait */
   }
+
+  /* clear all reset status flags */
+  TMS570_SYS1.SYSESR = 0xFFFFU;
 
   /* Initialize System - Clock, Flash settings with Efuse self check */
   tms570_system_hw_init();
@@ -545,9 +399,8 @@ BSP_START_TEXT_SECTION void bsp_start_hook_0( void )
   /* Configure system response to error conditions signaled to the ESM group1 */
   tms570_esm_init();
 
-  // (TM): see notes about not running _mpuInit_ below in bsp_start_hook_1
-  // {TM) TODO: _cacheEnable_ currently causes boot failure
-  // _cacheEnable_();
+  // configures and enables the ARM-core Memory Protection Unit (MPU)
+  _mpuInit_();
 
 #if 1
   /*
