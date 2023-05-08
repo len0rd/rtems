@@ -59,12 +59,12 @@ typedef struct{
   uint32_t FAULT_STATUS_REG;  /*Fault Status Register*/
   uint32_t FAULT_CLEAR_REG;   /*Fault Clear Register*/
   uint8_t reserved5 [16];
-#if defined(ARM_TMS570LC4357)
+#if TMS570_VARIANT == 4357
   uint32_t PINMMR[180]; /**< 0x110 - 1A4 : Output Pin Multiplexing Control
                            Registers (38 registers); 0x250 - 0x29C : Input Pin
                            Multiplexing Control Registers (20); 0X390 - 3DC :
                            Special Functionality Control Registers (20) */
-#elif defined(ARM_TMS570LS3137)
+#elif TMS570_VARIANT == 3137
     uint32_t PINMMR[30]; /*Pin Multiplexing Control Register 0-30*/
 #else
     #warning "Unknown or no TMS570 BSP variant defined"
