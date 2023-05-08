@@ -3,7 +3,7 @@
 /**
  * @file
  *
- * @ingroup RTEMSTestSuiteTestsuitesValidationIoKernel
+ * @ingroup TestsuitesValidationIoKernel
  */
 
 /*
@@ -62,10 +62,9 @@
 #include <rtems/test.h>
 
 /**
- * @defgroup RTEMSTestSuiteTestsuitesValidationIoKernel \
- *   spec:/testsuites/validation-io-kernel
+ * @defgroup TestsuitesValidationIoKernel spec:/testsuites/validation-io-kernel
  *
- * @ingroup RTEMSTestSuites
+ * @ingroup RTEMSTestSuitesValidation
  *
  * @brief This validation test suite contains test cases which test the kernel
  *   character input/output device provided by the BSP before the system
@@ -74,7 +73,7 @@
  * @{
  */
 
-const char rtems_test_name[] = "ValidationIoKernel";
+const char rtems_test_name[] = "TestsuitesValidationIoKernel";
 
 static char buffer[ 512 ];
 

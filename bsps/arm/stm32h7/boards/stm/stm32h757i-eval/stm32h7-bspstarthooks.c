@@ -36,6 +36,22 @@
 
 #include <string.h>
 
+#include <stm32h747i_eval_qspi.h>
+static BSP_QSPI_Init_t QSPinit;
+
+void stm32h7_init_qspi(void)
+{
+#if defined(STM32H7_MEMORY_QUADSPI_SIZE) && STM32H7_MEMORY_QUADSPI_SIZE > 0
+    /* let's initialize Quad SPI memory here for memory mapped mode */
+    /* due to usage of static QSPinit variable please call this function
+       after bsp_start_clear_bss call since otherwise you would hit uninitialized
+       variable memory while accessing it and in addition the call to bsp_start_clear_bss
+       would wipe the variable content later after its initialization here. */
+    BSP_QSPI_Init(0, &QSPinit);
+    BSP_QSPI_EnableMemoryMappedMode(0);
+#endif
+}
+
 void bsp_start_hook_0(void)
 {
   if ((RCC->AHB3ENR & RCC_AHB3ENR_FMCEN) == 0) {
@@ -63,7 +79,7 @@ void bsp_start_hook_0(void)
     SCB_EnableDCache();
   }
 
-  _ARMV7M_MPU_Setup(stm32h7_config_mpu_region, stm32h7_config_mpu_region_count);
+  _ARMV7M_MPU_Setup(ARMV7M_MPU_CTRL_DEFAULT, stm32h7_config_mpu_region, stm32h7_config_mpu_region_count);
 #endif
 }
 
@@ -75,4 +91,5 @@ void bsp_start_hook_1(void)
   SCB_InvalidateICache();
 #endif
   bsp_start_clear_bss();
+  stm32h7_init_qspi();
 }

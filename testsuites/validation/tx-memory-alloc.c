@@ -3,7 +3,7 @@
 /**
  * @file
  *
- * @ingroup RTEMSTestSuites
+ * @ingroup RTEMSTestSuitesValidation
  *
  * @brief This source file contains the implementation of
  *   MemoryAllocationFailWhen() and __wrap_rtems_malloc().

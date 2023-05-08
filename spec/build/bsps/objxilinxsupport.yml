@@ -1,4 +1,4 @@
-SPDX-License-Identifier: CC-BY-SA-5.0 OR BSD-2-Clause
+SPDX-License-Identifier: CC-BY-SA-4.0 OR BSD-2-Clause
 build-type: objects
 cflags: []
 copyrights:
@@ -16,7 +16,6 @@ install:
   - bsps/include/xil/sleep.h
   - bsps/include/xil/xbasic_types.h
   - bsps/include/xil/xil_assert.h
-  - bsps/include/xil/xil_exception.h
   - bsps/include/xil/xil_io.h
   - bsps/include/xil/xil_mem.h
   - bsps/include/xil/xil_printf.h

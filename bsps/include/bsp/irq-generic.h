@@ -3,10 +3,10 @@
 /**
  * @file
  *
- * @ingroup bsp_interrupt
+ * @ingroup RTEMSImplClassicIntr
  *
- * @brief This header file provides interfaces of the generic interrupt
- *   controller support.
+ * @brief This header file provides interfaces of the Interrupt Manager
+ *   implementation.
  */
 
 /*
@@ -101,29 +101,29 @@ static inline rtems_vector_number bsp_interrupt_dispatch_index(
 }
 
 /**
- * @defgroup bsp_interrupt BSP Interrupt Support
+ * @defgroup RTEMSImplClassicIntr Interrupt Manager
  *
- * @ingroup RTEMSBSPsShared
+ * @ingroup RTEMSImplClassic
  *
- * @brief Generic BSP Interrupt Support
+ * @brief This group contains the Interrupt Manager implementation.
  *
- * The BSP interrupt support manages a sequence of interrupt vector numbers
- * greater than or equal to zero and less than @ref BSP_INTERRUPT_VECTOR_COUNT
- * It provides methods to install, remove, and @ref
- * bsp_interrupt_handler_dispatch() "dispatch" interrupt entries for each
- * vector number.  It implements parts of the RTEMS interrupt manager.
+ * The Interrupt Manager implementation manages a sequence of interrupt vector
+ * numbers greater than or equal to zero and less than
+ * ``BSP_INTERRUPT_VECTOR_COUNT``.  It provides methods to install, remove, and
+ * dispatch interrupt entries for each vector number, see
+ * bsp_interrupt_dispatch_entries().
  *
  * The entry points to a list of interrupt entries are stored in a table
  * (= dispatch table).
  *
- * You have to configure the BSP interrupt support in the <bsp/irq.h> file
+ * You have to configure the Interrupt Manager implementation in the <bsp/irq.h> file
  * for each BSP.  For a minimum configuration you have to provide
- * @ref BSP_INTERRUPT_VECTOR_COUNT.
+ * ``BSP_INTERRUPT_VECTOR_COUNT``.
  *
  * For boards with small memory requirements you can define
- * @ref BSP_INTERRUPT_USE_INDEX_TABLE.  With an enabled index table the
+ * ``BSP_INTERRUPT_USE_INDEX_TABLE``.  With an enabled index table the
  * dispatch table will be accessed via a small index table.  You can define the
- * size of the dispatch table with @ref BSP_INTERRUPT_DISPATCH_TABLE_SIZE.
+ * size of the dispatch table with ``BSP_INTERRUPT_DISPATCH_TABLE_SIZE``.
  *
  * You have to provide some special routines in your BSP (follow the links for
  * the details):
@@ -175,7 +175,7 @@ static inline rtems_vector_number bsp_interrupt_dispatch_index(
 void bsp_interrupt_handler_default(rtems_vector_number vector);
 
 /**
- * @brief Initialize BSP interrupt support.
+ * @brief Initialize Interrupt Manager implementation.
  *
  * You must call this function before you can install, remove and dispatch
  * interrupt entries.  There is no protection against concurrent
@@ -259,7 +259,10 @@ rtems_status_code bsp_interrupt_vector_is_enabled(
  * @retval ::RTEMS_SUCCESSFUL The requested operation was successful.
  *
  * @retval ::RTEMS_UNSATISFIED The request to enable the interrupt vector has
- *   not been satisfied.
+ *   not been satisfied.  The presence of this error condition is
+ *   implementation-defined.  The interrupt vector attributes obtained by
+ *   rtems_interrupt_get_attributes() should indicate if it is possible to
+ *   enable a particular interrupt vector.
  */
 rtems_status_code bsp_interrupt_vector_enable( rtems_vector_number vector );
 
@@ -280,7 +283,10 @@ rtems_status_code bsp_interrupt_vector_enable( rtems_vector_number vector );
  * @retval ::RTEMS_SUCCESSFUL The requested operation was successful.
  *
  * @retval ::RTEMS_UNSATISFIED The request to disable the interrupt vector has
- *   not been satisfied.
+ *   not been satisfied.  The presence of this error condition is
+ *   implementation-defined.  The interrupt vector attributes obtained by
+ *   rtems_interrupt_get_attributes() should indicate if it is possible to
+ *   disable a particular interrupt vector.
  */
 rtems_status_code bsp_interrupt_vector_disable( rtems_vector_number vector );
 
@@ -318,8 +324,11 @@ rtems_status_code bsp_interrupt_is_pending(
  *
  * @retval ::RTEMS_SUCCESSFUL The requested operation was successful.
  *
- * @retval ::RTEMS_UNSATISFIED The request to cause the interrupt vector has
- *   not been satisfied.
+ * @retval ::RTEMS_UNSATISFIED The request to raise the interrupt vector has
+ *   not been satisfied.  The presence of this error condition is
+ *   implementation-defined.  The interrupt vector attributes obtained by
+ *   rtems_interrupt_get_attributes() should indicate if it is possible to
+ *   raise a particular interrupt vector.
  */
 rtems_status_code bsp_interrupt_raise( rtems_vector_number vector );
 
@@ -336,7 +345,10 @@ rtems_status_code bsp_interrupt_raise( rtems_vector_number vector );
  * @retval ::RTEMS_SUCCESSFUL The requested operation was successful.
  *
  * @retval ::RTEMS_UNSATISFIED The request to cause the interrupt vector has
- *   not been satisfied.
+ *   not been satisfied.  The presence of this error condition is
+ *   implementation-defined.  The interrupt vector attributes obtained by
+ *   rtems_interrupt_get_attributes() should indicate if it is possible to
+ *   raise a particular interrupt vector on a specific processor.
  */
 rtems_status_code bsp_interrupt_raise_on(
   rtems_vector_number vector,
@@ -353,7 +365,10 @@ rtems_status_code bsp_interrupt_raise_on(
  * @retval ::RTEMS_SUCCESSFUL The requested operation was successful.
  *
  * @retval ::RTEMS_UNSATISFIED The request to cause the interrupt vector has
- *   not been satisfied.
+ *   not been satisfied.  The presence of this error condition is
+ *   implementation-defined.  The interrupt vector attributes obtained by
+ *   rtems_interrupt_get_attributes() should indicate if it is possible to
+ *   clear a particular interrupt vector.
  */
 rtems_status_code bsp_interrupt_clear( rtems_vector_number vector );
 

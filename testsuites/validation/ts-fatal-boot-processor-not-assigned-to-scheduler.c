@@ -3,7 +3,7 @@
 /**
  * @file
  *
- * @ingroup RTEMSTestSuiteTestsuitesFatalBootProcessorNotAssignedToScheduler
+ * @ingroup TestsuitesFatalBootProcessorNotAssignedToScheduler
  */
 
 /*
@@ -58,10 +58,10 @@
 #include <rtems/test.h>
 
 /**
- * @defgroup RTEMSTestSuiteTestsuitesFatalBootProcessorNotAssignedToScheduler \
+ * @defgroup TestsuitesFatalBootProcessorNotAssignedToScheduler \
  *   spec:/testsuites/fatal-boot-processor-not-assigned-to-scheduler
  *
- * @ingroup RTEMSTestSuites
+ * @ingroup RTEMSTestSuitesValidation
  *
  * @brief This validation test suite uses an application configuration which
  *   triggers a fatal error during system initialization.
@@ -69,7 +69,7 @@
  * @{
  */
 
-const char rtems_test_name[] = "FatalBootProcessorNotAssignedToScheduler";
+const char rtems_test_name[] = "TestsuitesFatalBootProcessorNotAssignedToScheduler";
 
 #define FATAL_SYSINIT_RUN \
   ScoreSmpValFatalBootProcessorNotAssignedToScheduler_Run

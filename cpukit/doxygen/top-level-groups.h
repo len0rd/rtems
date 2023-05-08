@@ -1,7 +1,15 @@
 /* SPDX-License-Identifier: BSD-2-Clause */
 
+/**
+ * @file
+ *
+ * @ingroup RTEMSImplDoxygen
+ *
+ * @brief This header file defines high level Doxygen groups.
+ */
+
 /*
- * Copyright (C) 2019, 2020 embedded brains GmbH (http://www.embedded-brains.de)
+ * Copyright (C) 2019, 2023 embedded brains GmbH (http://www.embedded-brains.de)
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -45,7 +53,46 @@
  */
 
 /**
+ * @defgroup RTEMSImplDoxygen Doxygen Support
+ *
+ * @ingroup RTEMSImpl
+ */
+
+/**
+ * @defgroup RTEMSImplFreeBSDKernel FreeBSD Kernel Space Support
+ *
+ * @ingroup RTEMSImpl
+ *
+ * @brief This group contains the interfaces used by FreeBSD kernel space
+ *   components ported to RTEMS.
+ */
+
+/**
  * @defgroup RTEMSTestSuites Test Suites
  *
  * @brief This group contains the test suites.
+ */
+
+/**
+ * @defgroup RTEMSTestSuitesFilesystem Filesystem Test Suites
+ *
+ * @ingroup RTEMSTestSuites
+ *
+ * @brief This group contains the test suites related to filesystem tests.
+ */
+
+/**
+ * @defgroup RTEMSTestSuitesUnit Unit Test Suites
+ *
+ * @ingroup RTEMSTestSuites
+ *
+ * @brief This group contains the test suites related to unit tests.
+ */
+
+/**
+ * @defgroup RTEMSTestSuitesValidation Validation Test Suites
+ *
+ * @ingroup RTEMSTestSuites
+ *
+ * @brief This group contains the test suites related to validation tests.
  */

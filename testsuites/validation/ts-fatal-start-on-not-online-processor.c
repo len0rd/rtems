@@ -3,7 +3,7 @@
 /**
  * @file
  *
- * @ingroup RTEMSTestSuiteTestsuitesFatalStartOnNotOnlineProcessor
+ * @ingroup TestsuitesFatalStartOnNotOnlineProcessor
  */
 
 /*
@@ -58,10 +58,10 @@
 #include <rtems/test.h>
 
 /**
- * @defgroup RTEMSTestSuiteTestsuitesFatalStartOnNotOnlineProcessor \
+ * @defgroup TestsuitesFatalStartOnNotOnlineProcessor \
  *   spec:/testsuites/fatal-start-on-not-online-processor
  *
- * @ingroup RTEMSTestSuites
+ * @ingroup RTEMSTestSuitesValidation
  *
  * @brief This validation test suite contains a test case which triggers a
  *   fatal error during system initialization.
@@ -69,7 +69,7 @@
  * @{
  */
 
-const char rtems_test_name[] = "FatalStartOnNotOnlineProcessor";
+const char rtems_test_name[] = "TestsuitesFatalStartOnNotOnlineProcessor";
 
 #define FATAL_SYSINIT_RUN ScoreSmpValFatalStartOnNotOnlineProcessor_Run
 

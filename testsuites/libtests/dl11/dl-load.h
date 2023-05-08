@@ -1,14 +1,7 @@
 /* SPDX-License-Identifier: BSD-2-Clause */
 
-/**
- * @file
- *
- * @brief Adds a GDB remote Debug Stub to an RTEMS System
- */
-
 /*
- * Copyright (c) 2002 IMD Ingenieurbuero fuer Microcomputertechnik
- * All rights reserved.
+ * Copyright (c) 2014 Chris Johns <chrisj@rtems.org>.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -32,70 +25,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _SERDBGCNF_H
-#define _SERDBGCNF_H
+#if !defined(_DL_LOAD_H_)
+#define _DL_LOAD_H_
 
-#include <rtems/serdbg.h>
+int dl_load_test(void);
 
-#ifdef __cplusplus
-extern "C" {
 #endif
-
-#ifdef CONFIGURE_INIT
-
-/*
- * fallback for baud rate to use
- */
-#ifndef CONFIGURE_SERDBG_BAUDRATE
-#define CONFIGURE_SERDBG_BAUDRATE 9600
-#endif
-
-/*
- * fallback for device name to use
- */
-#ifndef CONFIGURE_SERDBG_DEVNAME
-#define CONFIGURE_SERDBG_DEVNAME "/dev/tty01"
-#endif
-
-/*
- * fill in serdbg_conf structure
- */
-serdbg_conf_t serdbg_conf = {
-  CONFIGURE_SERDBG_BAUDRATE,
-
-#ifdef CONFIGURE_SERDBG_CALLOUT
-  CONFIGURE_SERDBG_CALLOUT,
-#else
-  NULL,
-#endif
-
-#ifdef CONFIGURE_SERDBG_USE_POLLED_TERMIOS
-  serdbg_open,
-#else
-  NULL,
-#endif
-
-  CONFIGURE_SERDBG_DEVNAME,
-
-#ifdef CONFIGURE_SERDBG_SKIP_INIT_BKPT
-  true,
-#else
-  false,
-#endif
-};
-
-int serdbg_init(void) {
-#ifdef CONFIGURE_USE_SERDBG
-  return serdbg_init_dbg();
-#else
-  return 0;
-#endif
-}
-
-#endif /* CONFIGURE_INIT */
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* _SERDBGCNF_H */

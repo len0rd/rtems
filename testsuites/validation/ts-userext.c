@@ -3,7 +3,7 @@
 /**
  * @file
  *
- * @ingroup RTEMSTestSuiteTestsuitesUserext
+ * @ingroup TestsuitesUserext
  */
 
 /*
@@ -57,9 +57,9 @@
 #include <rtems/test.h>
 
 /**
- * @defgroup RTEMSTestSuiteTestsuitesUserext spec:/testsuites/userext
+ * @defgroup TestsuitesUserext spec:/testsuites/userext
  *
- * @ingroup RTEMSTestSuites
+ * @ingroup RTEMSTestSuitesValidation
  *
  * @brief This validation test suite contains a test cases related to the
  *   invocation of user extensions.
@@ -67,7 +67,7 @@
  * @{
  */
 
-const char rtems_test_name[] = "Userext";
+const char rtems_test_name[] = "TestsuitesUserext";
 
 #define CONFIGURE_MAXIMUM_PROCESSORS 2
 

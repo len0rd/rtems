@@ -7,7 +7,7 @@
 /**
 *
 * @file xnandpsu.h
-* @addtogroup nandpsu_v1_10
+* @addtogroup Overview
 * @{
 * @details
 *
@@ -152,6 +152,8 @@
 * 1.10  akm    10/20/21    Fix gcc warnings.
 * 1.10  akm    12/21/21    Validate input parameters before use.
 * 1.10  akm    01/05/22    Remove assert checks form static and internal APIs.
+* 1.11  akm    03/31/22    Fix unused parameter warning.
+* 1.11  akm    03/31/22    Fix misleading-indentation warning.
 *
 * </pre>
 *
@@ -179,7 +181,11 @@ extern "C" {
 
 #define XNANDPSU_DEBUG
 
+#ifdef __rtems__
+#define XNANDPSU_MAX_TARGETS		2U	/**< ce_n0, ce_n1 */
+#else
 #define XNANDPSU_MAX_TARGETS		1U	/**< ce_n0, ce_n1 */
+#endif
 #define XNANDPSU_MAX_PKT_SIZE		0x7FFU	/**< Max packet size */
 #define XNANDPSU_MAX_PKT_COUNT		0xFFFU	/**< Max packet count */
 

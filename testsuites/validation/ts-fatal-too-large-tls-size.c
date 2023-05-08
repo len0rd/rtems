@@ -3,7 +3,7 @@
 /**
  * @file
  *
- * @ingroup RTEMSTestSuiteTestsuitesFatalTooLargeTlsSize
+ * @ingroup TestsuitesFatalTooLargeTlsSize
  */
 
 /*
@@ -57,10 +57,10 @@
 #include <rtems/test.h>
 
 /**
- * @defgroup RTEMSTestSuiteTestsuitesFatalTooLargeTlsSize \
+ * @defgroup TestsuitesFatalTooLargeTlsSize \
  *   spec:/testsuites/fatal-too-large-tls-size
  *
- * @ingroup RTEMSTestSuites
+ * @ingroup RTEMSTestSuitesValidation
  *
  * @brief This validation test suite contains a test case which triggers a
  *   fatal error during system initialization.
@@ -68,7 +68,7 @@
  * @{
  */
 
-const char rtems_test_name[] = "FatalTooLargeTlsSize";
+const char rtems_test_name[] = "TestsuitesFatalTooLargeTlsSize";
 
 #define FATAL_SYSINIT_RUN AcfgValFatalTooLargeTlsSize_Run
 

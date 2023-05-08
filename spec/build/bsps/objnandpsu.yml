@@ -1,4 +1,4 @@
-SPDX-License-Identifier: CC-BY-SA-5.0 OR BSD-2-Clause
+SPDX-License-Identifier: CC-BY-SA-4.0 OR BSD-2-Clause
 build-type: objects
 cflags: []
 copyrights:
@@ -11,15 +11,13 @@ includes:
 - bsps/include/xil/
 - bsps/include/xil/${XIL_SUPPORT_PATH}/
 install:
-- destination: ${BSP_INCLUDEDIR}
+- destination: ${BSP_INCLUDEDIR}/dev/nand
   source:
   - bsps/include/dev/nand/xnandpsu_bbm.h
   - bsps/include/dev/nand/xnandpsu.h
   - bsps/include/dev/nand/xnandpsu_hw.h
   - bsps/include/dev/nand/xnandpsu_onfi.h
-links:
-- role: build-dependency
-  uid: objxilinxsupport
+links: []
 source:
 - bsps/shared/dev/nand/xnandpsu_bbm.c
 - bsps/shared/dev/nand/xnandpsu.c

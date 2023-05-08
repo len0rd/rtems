@@ -6,7 +6,9 @@ build-type: option
 copyrights:
 - Copyright (C) 2020 embedded brains GmbH (http://www.embedded-brains.de)
 default:
-- enabled-by: riscv/frdme310arty
+- enabled-by:
+  - riscv/frdme310arty
+  - riscv/kendrytek210
   value: null
 - enabled-by: riscv/mpfs64imafdc
   value: 1

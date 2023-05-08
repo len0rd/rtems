@@ -3,7 +3,7 @@
 /**
  * @file
  *
- * @ingroup RTEMSTestSuites
+ * @ingroup RTEMSTestSuitesValidation
  *
  * @brief This source file contains the implementation of CallWithinISRClear(),
  *   CallWithinISRGetVector(), CallWithinISR(), CallWithinISRRaise(),
@@ -76,11 +76,15 @@ void CallWithinISRClear( void )
   Clear_tm27_intr();
 }
 
-static void CallWithinISRHandler( rtems_vector_number vector )
+#ifdef TM27_USE_VECTOR_HANDLER
+static rtems_isr CallWithinISRHandler( rtems_vector_number arg )
+#else
+static void CallWithinISRHandler( void *arg )
+#endif
 {
   CallWithinISRContext *ctx;
 
-  (void) vector;
+  (void) arg;
   ctx = &CallWithinISRInstance;
 
   CallWithinISRClear();
@@ -148,7 +152,7 @@ static void CallWithinISRIsHandlerInstalled(
   (void) option;
   (void) handler_arg;
 
-  if ( handler == (rtems_interrupt_handler) CallWithinISRHandler ) {
+  if ( handler == CallWithinISRHandler ) {
     *(bool *) arg = true;
   }
 }

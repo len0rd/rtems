@@ -1,4 +1,4 @@
-SPDX-License-Identifier: CC-BY-SA-5.0 OR BSD-2-Clause
+SPDX-License-Identifier: CC-BY-SA-4.0 OR BSD-2-Clause
 build-type: objects
 cflags: []
 copyrights:
@@ -15,6 +15,7 @@ install:
 - destination: ${BSP_INCLUDEDIR}
   source:
   - bsps/include/xil/arm/ARMv8/64bit/xil_cache.h
+  - bsps/include/xil/arm/ARMv8/64bit/xil_exception.h
   - bsps/include/xil/arm/ARMv8/64bit/xpseudo_asm.h
   - bsps/include/xil/arm/ARMv8/64bit/xreg_cortexa53.h
 links: []
