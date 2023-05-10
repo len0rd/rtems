@@ -3,7 +3,7 @@
 /**
  * @file
  *
- * @ingroup RTEMSTestCaseRtemsTaskValPerf
+ * @ingroup RtemsTaskValPerf
  */
 
 /*
@@ -60,9 +60,9 @@
 #include <rtems/test.h>
 
 /**
- * @defgroup RTEMSTestCaseRtemsTaskValPerf spec:/rtems/task/val/perf
+ * @defgroup RtemsTaskValPerf spec:/rtems/task/val/perf
  *
- * @ingroup RTEMSTestSuiteTestsuitesPerformanceNoClock0
+ * @ingroup TestsuitesPerformanceNoClock0
  *
  * @brief This test case provides a context to run @ref RTEMSAPIClassicTasks
  *   performance tests.
@@ -113,13 +113,13 @@ typedef struct {
 static RtemsTaskValPerf_Context
   RtemsTaskValPerf_Instance;
 
-typedef RtemsTaskValPerf_Context Context;
+#define EVENT_RESTART RTEMS_EVENT_0
 
-enum {
-  EVENT_RESTART = RTEMS_EVENT_0,
-  EVENT_SET_END = RTEMS_EVENT_1,
-  EVENT_BUSY = RTEMS_EVENT_2
-} Event;
+#define EVENT_SET_END RTEMS_EVENT_1
+
+#define EVENT_BUSY RTEMS_EVENT_2
+
+typedef RtemsTaskValPerf_Context Context;
 
 RTEMS_ALIGNED( RTEMS_TASK_STORAGE_ALIGNMENT ) static char task_storage[
   RTEMS_TASK_STORAGE_SIZE(

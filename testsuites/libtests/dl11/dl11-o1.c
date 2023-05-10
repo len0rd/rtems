@@ -1,14 +1,7 @@
 /* SPDX-License-Identifier: BSD-2-Clause */
 
-/**
- * @file
- *
- * @brief Adds printk Support via Polled termios
- */
-
 /*
- * Copyright (c) 2002 IMD Ingenieurbuero fuer Microcomputertechnik
- * All rights reserved.
+ * Copyright (C) 2023 On-Line Applications Research Corporation (OAR).
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -32,60 +25,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _TERMIOS_PRINTK_CNF_H
-#define _TERMIOS_PRINTK_CNF_H
+#include <rtems/test-info.h>
+#include <errno.h>
 
-#include <rtems/termios_printk.h>
+int get_errno_val (void);
+int *get_errno_ptr (void);
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#ifdef CONFIGURE_INIT
-
-/*
- * fallback for baud rate to use
- */
-#ifndef CONFIGURE_TERMIOS_PRINTK_BAUDRATE
-#define CONFIGURE_TERMIOS_PRINTK_BAUDRATE 9600
-#endif
-
-/*
- * fallback for device name to use
- */
-#ifndef CONFIGURE_TERMIOS_PRINTK_DEVNAME
-#define CONFIGURE_TERMIOS_PRINTK_DEVNAME "/dev/console"
-#endif
-
-#ifdef CONFIGURE_USE_TERMIOS_PRINTK
-/*
- * fill in termios_printk_conf structure
- */
-termios_printk_conf_t termios_printk_conf = {
-  CONFIGURE_TERMIOS_PRINTK_BAUDRATE,
-
-#ifdef CONFIGURE_TERMIOS_PRINTK_CALLOUT
-  CONFIGURE_TERMIOS_PRINTK_CALLOUT,
-#else
-  NULL,
-#endif
-  CONFIGURE_TERMIOS_PRINTK_DEVNAME,
-};
-#endif
-
-int termios_printk_init(void) {
-#ifdef CONFIGURE_USE_TERMIOS_PRINTK
-  return termios_printk_open(termios_printk_conf.devname,
-			     termios_printk_conf.baudrate);
-#else
-  return 0;
-#endif
+int get_errno_val (void)
+{
+  return errno;
 }
 
-#endif /* CONFIGURE_INIT */
-
-#ifdef __cplusplus
+int *get_errno_ptr (void)
+{
+  return &errno;
 }
-#endif
-
-#endif /* _TERMIOS_PRINTK_CNF_H */

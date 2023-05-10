@@ -3,7 +3,7 @@
 /**
  * @file
  *
- * @ingroup RTEMSTestCaseRtemsMessageValPerf
+ * @ingroup RtemsMessageValPerf
  */
 
 /*
@@ -59,9 +59,9 @@
 #include <rtems/test.h>
 
 /**
- * @defgroup RTEMSTestCaseRtemsMessageValPerf spec:/rtems/message/val/perf
+ * @defgroup RtemsMessageValPerf spec:/rtems/message/val/perf
  *
- * @ingroup RTEMSTestSuiteTestsuitesPerformanceNoClock0
+ * @ingroup TestsuitesPerformanceNoClock0
  *
  * @brief This test case provides a context to run @ref RTEMSAPIClassicMessage
  *   performance tests.
@@ -121,15 +121,17 @@ static RtemsMessageValPerf_Context
 
 #define MAXIMUM_MESSAGE_SIZE 8
 
-typedef RtemsMessageValPerf_Context Context;
+#define EVENT_END RTEMS_EVENT_0
 
-typedef enum {
-  EVENT_END = RTEMS_EVENT_0,
-  EVENT_SEND = RTEMS_EVENT_1,
-  EVENT_SEND_END = RTEMS_EVENT_2,
-  EVENT_RECEIVE = RTEMS_EVENT_3,
-  EVENT_RECEIVE_END = RTEMS_EVENT_4
-} Event;
+#define EVENT_SEND RTEMS_EVENT_1
+
+#define EVENT_SEND_END RTEMS_EVENT_2
+
+#define EVENT_RECEIVE RTEMS_EVENT_3
+
+#define EVENT_RECEIVE_END RTEMS_EVENT_4
+
+typedef RtemsMessageValPerf_Context Context;
 
 static RTEMS_MESSAGE_QUEUE_BUFFER( MAXIMUM_MESSAGE_SIZE )
   storage_area[ MAXIMUM_PENDING_MESSAGES ];

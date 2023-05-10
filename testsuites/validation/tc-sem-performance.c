@@ -3,7 +3,7 @@
 /**
  * @file
  *
- * @ingroup RTEMSTestCaseRtemsSemValPerf
+ * @ingroup RtemsSemValPerf
  */
 
 /*
@@ -59,9 +59,9 @@
 #include <rtems/test.h>
 
 /**
- * @defgroup RTEMSTestCaseRtemsSemValPerf spec:/rtems/sem/val/perf
+ * @defgroup RtemsSemValPerf spec:/rtems/sem/val/perf
  *
- * @ingroup RTEMSTestSuiteTestsuitesPerformanceNoClock0
+ * @ingroup TestsuitesPerformanceNoClock0
  *
  * @brief This test case provides a context to run @ref RTEMSAPIClassicSem
  *   performance tests.
@@ -112,15 +112,17 @@ typedef struct {
 static RtemsSemValPerf_Context
   RtemsSemValPerf_Instance;
 
-typedef RtemsSemValPerf_Context Context;
+#define EVENT_END RTEMS_EVENT_0
 
-typedef enum {
-  EVENT_END = RTEMS_EVENT_0,
-  EVENT_OBTAIN = RTEMS_EVENT_1,
-  EVENT_OBTAIN_END = RTEMS_EVENT_2,
-  EVENT_RELEASE = RTEMS_EVENT_3,
-  EVENT_RELEASE_END = RTEMS_EVENT_4
-} Event;
+#define EVENT_OBTAIN RTEMS_EVENT_1
+
+#define EVENT_OBTAIN_END RTEMS_EVENT_2
+
+#define EVENT_RELEASE RTEMS_EVENT_3
+
+#define EVENT_RELEASE_END RTEMS_EVENT_4
+
+typedef RtemsSemValPerf_Context Context;
 
 static void Send( const Context *ctx, rtems_event_set events )
 {

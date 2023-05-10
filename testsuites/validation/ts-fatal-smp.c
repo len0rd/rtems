@@ -3,7 +3,7 @@
 /**
  * @file
  *
- * @ingroup RTEMSTestSuiteTestsuitesFatalSmp
+ * @ingroup TestsuitesFatalSmp
  */
 
 /*
@@ -58,9 +58,9 @@
 #include <rtems/test.h>
 
 /**
- * @defgroup RTEMSTestSuiteTestsuitesFatalSmp spec:/testsuites/fatal-smp
+ * @defgroup TestsuitesFatalSmp spec:/testsuites/fatal-smp
  *
- * @ingroup RTEMSTestSuites
+ * @ingroup RTEMSTestSuitesValidation
  *
  * @brief This validation test suite contains a test case which triggers
  *   SMP-specific fatal errors.
@@ -68,7 +68,7 @@
  * @{
  */
 
-const char rtems_test_name[] = "FatalSmp";
+const char rtems_test_name[] = "TestsuitesFatalSmp";
 
 #define FATAL_SYSINIT_RUN ScoreSmpValFatal_Run
 

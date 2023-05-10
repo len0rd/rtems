@@ -3,7 +3,7 @@
 /**
  * @file
  *
- * @ingroup RTEMSTestSuiteTestsuitesFatalIdleThreadCreateFailed
+ * @ingroup TestsuitesFatalIdleThreadCreateFailed
  */
 
 /*
@@ -57,10 +57,10 @@
 #include <rtems/test.h>
 
 /**
- * @defgroup RTEMSTestSuiteTestsuitesFatalIdleThreadCreateFailed \
+ * @defgroup TestsuitesFatalIdleThreadCreateFailed \
  *   spec:/testsuites/fatal-idle-thread-create-failed
  *
- * @ingroup RTEMSTestSuites
+ * @ingroup RTEMSTestSuitesValidation
  *
  * @brief This validation test suite contains a test case which is triggered by
  *   a fatal error during system initialization.
@@ -68,7 +68,7 @@
  * @{
  */
 
-const char rtems_test_name[] = "FatalIdleThreadCreateFailed";
+const char rtems_test_name[] = "TestsuitesFatalIdleThreadCreateFailed";
 
 static bool CreateTask( rtems_tcb *executing, rtems_tcb *created )
 {

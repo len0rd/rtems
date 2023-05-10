@@ -3,7 +3,7 @@
 /**
  * @file
  *
- * @ingroup RTEMSTestSuiteTestsuitesValidation1
+ * @ingroup TestsuitesValidation1
  */
 
 /*
@@ -55,9 +55,9 @@
 #include <rtems/test.h>
 
 /**
- * @defgroup RTEMSTestSuiteTestsuitesValidation1 spec:/testsuites/validation-1
+ * @defgroup TestsuitesValidation1 spec:/testsuites/validation-1
  *
- * @ingroup RTEMSTestSuites
+ * @ingroup RTEMSTestSuitesValidation
  *
  * @brief This general purpose validation test suite provides enough resources
  *   to run basic tests for all specified managers and functions.
@@ -68,7 +68,7 @@
  * @{
  */
 
-const char rtems_test_name[] = "Validation1";
+const char rtems_test_name[] = "TestsuitesValidation1";
 
 #define CONFIGURE_MAXIMUM_PROCESSORS 5
 

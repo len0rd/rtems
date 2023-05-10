@@ -3,7 +3,7 @@
 /**
  * @file
  *
- * @ingroup RTEMSTestSuiteTestsuitesValidationTls0
+ * @ingroup TestsuitesValidationTls0
  */
 
 /*
@@ -55,10 +55,9 @@
 #include <rtems/test.h>
 
 /**
- * @defgroup RTEMSTestSuiteTestsuitesValidationTls0 \
- *   spec:/testsuites/validation-tls-0
+ * @defgroup TestsuitesValidationTls0 spec:/testsuites/validation-tls-0
  *
- * @ingroup RTEMSTestSuites
+ * @ingroup RTEMSTestSuitesValidation
  *
  * @brief This validation test suite contains test cases related to the
  *   thread-local storage support.
@@ -66,7 +65,7 @@
  * @{
  */
 
-const char rtems_test_name[] = "ValidationTls0";
+const char rtems_test_name[] = "TestsuitesValidationTls0";
 
 #define MAX_TLS_SIZE 1024
 

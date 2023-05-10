@@ -3,7 +3,7 @@
 /**
  * @file
  *
- * @ingroup RTEMSTestSuites
+ * @ingroup RTEMSTestSuitesValidation
  *
  * @brief This header file provides the support functions for the validation
  *   test cases.
@@ -47,7 +47,7 @@ extern "C" {
 #endif
 
 /**
- * @addtogroup RTEMSTestSuites
+ * @addtogroup RTEMSTestSuitesValidation
  *
  * @{
  */

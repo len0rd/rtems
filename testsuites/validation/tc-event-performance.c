@@ -3,7 +3,7 @@
 /**
  * @file
  *
- * @ingroup RTEMSTestCaseRtemsEventValPerf
+ * @ingroup RtemsEventValPerf
  */
 
 /*
@@ -59,9 +59,9 @@
 #include <rtems/test.h>
 
 /**
- * @defgroup RTEMSTestCaseRtemsEventValPerf spec:/rtems/event/val/perf
+ * @defgroup RtemsEventValPerf spec:/rtems/event/val/perf
  *
- * @ingroup RTEMSTestSuiteTestsuitesPerformanceNoClock0
+ * @ingroup TestsuitesPerformanceNoClock0
  *
  * @brief This test case provides a context to run @ref RTEMSAPIClassicEvent
  *   performance tests.
@@ -107,12 +107,11 @@ typedef struct {
 static RtemsEventValPerf_Context
   RtemsEventValPerf_Instance;
 
-typedef RtemsEventValPerf_Context Context;
+#define EVENT_END RTEMS_EVENT_0
 
-typedef enum {
-  EVENT_END = RTEMS_EVENT_0,
-  EVENT_OTHER = RTEMS_EVENT_1
-} Event;
+#define EVENT_OTHER RTEMS_EVENT_1
+
+typedef RtemsEventValPerf_Context Context;
 
 static void Send( const Context *ctx, rtems_event_set events )
 {

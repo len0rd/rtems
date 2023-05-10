@@ -3,7 +3,7 @@
 /**
  * @file
  *
- * @ingroup RTEMSTestSuiteTestsuitesFatalIdleThreadStackTooSmall
+ * @ingroup TestsuitesFatalIdleThreadStackTooSmall
  */
 
 /*
@@ -57,10 +57,10 @@
 #include <rtems/test.h>
 
 /**
- * @defgroup RTEMSTestSuiteTestsuitesFatalIdleThreadStackTooSmall \
+ * @defgroup TestsuitesFatalIdleThreadStackTooSmall \
  *   spec:/testsuites/fatal-idle-thread-stack-too-small
  *
- * @ingroup RTEMSTestSuites
+ * @ingroup RTEMSTestSuitesValidation
  *
  * @brief This validation test suite contains a test case which triggers a
  *   fatal error during system initialization.
@@ -68,7 +68,7 @@
  * @{
  */
 
-const char rtems_test_name[] = "FatalIdleThreadStackTooSmall";
+const char rtems_test_name[] = "TestsuitesFatalIdleThreadStackTooSmall";
 
 #define FATAL_SYSINIT_RUN ScoreThreadValFatalIdleThreadStackTooSmall_Run
 

@@ -412,6 +412,9 @@ static void move_gap(struct editor *ed, int pos, int minsize) {
     if (gapsize + MINEXTEND > minsize) minsize = gapsize + MINEXTEND;
     newsize = (ed->end - ed->start) - gapsize + minsize;
     start = (unsigned char *) malloc(newsize); // TODO check for out of memory
+    if (start == NULL) {
+        return;
+    }
     gap = start + pos;
     rest = gap + minsize;
     end = start + newsize;
@@ -1710,7 +1713,6 @@ static void copy_selection(struct editor *ed) {
   ed->env->clipboard = (unsigned char *) realloc(ed->env->clipboard, ed->env->clipsize);
   if (!ed->env->clipboard) return;
   copy(ed, ed->env->clipboard, selstart, ed->env->clipsize);
-  select_toggle(ed);
 }
 
 static void cut_selection(struct editor *ed) {
@@ -1809,14 +1811,14 @@ static void save_editor(struct editor *ed) {
   ed->refresh = 1;
 }
 
-static void close_editor(struct editor *ed) {
+static struct editor* close_editor(struct editor *ed) {
   struct env *env = ed->env;
 
   if (ed->dirty) {
     display_message(ed, "Close %s without saving changes (y/n)? ", ed->filename);
     if (!ask()) {
       ed->refresh = 1;
-      return;
+      return ed;
     }
   }
 
@@ -1828,6 +1830,7 @@ static void close_editor(struct editor *ed) {
     new_file(ed, "");
   }
   ed->refresh = 1;
+  return ed;
 }
 
 static void pipe_command(struct editor *ed) {
@@ -2128,7 +2131,7 @@ static void edit(struct editor *ed) {
 
         case ctrl('e'): select_toggle(ed); break;
         case ctrl('a'): select_all(ed); break;
-        case ctrl('c'): copy_selection(ed); break;
+        case ctrl('c'): copy_selection(ed);select_toggle(ed); break;
         case ctrl('f'): find_text(ed, 0); break;
         case ctrl('l'): goto_line(ed); break;
         case ctrl('g'): find_text(ed, 1); break;
@@ -2151,15 +2154,7 @@ static void edit(struct editor *ed) {
         case ctrl('s'): save_editor(ed); break;
         case ctrl('p'): pipe_command(ed); break;
 #endif
-#if defined(__rtems__)
-        /*
-         * Coverity spotted this as using ed after free() so changing
-         * the order of the statements.
-         */
-        case ctrl('w'): ed = ed->env->current; close_editor(ed); break;
-#else
-        case ctrl('w'): close_editor(ed); ed = ed->env->current; break;
-#endif
+        case ctrl('w'): ed = close_editor(ed); break;
       }
     }
   }
