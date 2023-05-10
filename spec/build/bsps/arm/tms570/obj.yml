@@ -76,6 +76,7 @@ install:
   - bsps/arm/tms570/start/linkcmds.tms570lc4357_hdk_sdram
 links: []
 source:
+- bsps/arm/tms570/start/tms570_sys_core.S
 - bsps/arm/shared/cp15/arm-cp15-set-exception-handler.c
 - bsps/arm/shared/cp15/arm-cp15-set-ttb-entries.c
 - bsps/arm/shared/start/bsp-start-memcpy.S

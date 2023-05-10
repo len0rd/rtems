@@ -305,8 +305,7 @@ void tms570_pinmux_init( void )
 {
     tms570_bsp_pinmmr_config(tms570_pinmmr_init_data, 0, RTEMS_ARRAY_SIZE(tms570_pinmmr_init_data));
 
-    tms570_bsp_pinmmr_unlock();
+    tms570_pin_config_prepare();
     TMS570_PINMUX[174] = (TMS570_PINMUX[174] & ~(0x3 << 8)) | (0x1 << 9); // emif output-enable bit8= 0, bit9= 1
-    TMS570_PINMUX[160] &= ~(1 << 24); // Set Ethernet to MII mode
-    tms570_bsp_pinmmr_lock();
+    tms570_pin_config_complete();
 }

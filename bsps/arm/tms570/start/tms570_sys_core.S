@@ -33,6 +33,7 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 -------------------------------------------------------------------------*/
+#include <dev/cache/arm-data-cache-loop-set-way.h>
 
     .section .text
     .syntax unified
@@ -583,25 +584,55 @@ _cacheEnable_:
         stmfd sp!, {r0-r1}
         mov r0,#0
 
-        MRC p15, #0, r1, c1, c0, #1     @ Read auxiliary control register
-        BIC r1, r1, #0x1 << 5           @ bit is default set to disable ECC. Clearing bit 5
-        MCR p15, #0, r1, c1, c0, #1     @ enable ECC, generate abort on ECC errors, enable
-                                        @ hardware recovery
+        /*
+        * Make sure SCTLR[M, I, A, C, V] are cleared.
+        */
+        mrc	p15, 0, r0, c1, c0, 0
+        bic	r1, r0, #0x1000
+        bic	r1, r1, #0x6
 
-        MRC   p15, #0, R1, c1, c0, #0   @ Read System Control Register configuration data
-        ORR   R1, R1, #0x1 <<12         @ instruction cache enable
-        ORR   R1, R1, #0x1 <<2          @ data cache enable
-        DSB
-        MCR   p15, #0, r0, c15, c5, #0  @ Invalidate entire data cache
-        DSB                             @ delay is required, manually added
-        MCR   p15, #0, r0, c7, c5, #0   @ Invalidate entire instruction cache
-        DSB                             @ delay is required, manually added
-        MCR   p15, #0, R1, c1, c0, #0   @ enabled cache RAMs
-        ISB
+        mcr	p15, 0, r1, c1, c0, 0
+	    isb
 
-        ldmfd sp!, {r0-r1}
+	/* Check previous SCTLR[C] and initialize data caches */
+	tst	r0, #0x4
+	bne	.Lclean_invalidate_data_caches
 
-        bx    lr
+	/*
+	 * Invalidate the sets and ways of all data or unified cache levels
+	 * using DCISW (Data Cache line Invalidate by Set/Way).
+	 */
+	ARM_DATA_CACHE_LOOP_SET_WAY c6
+	b	.Ldata_caches_initialized
+
+.Lclean_invalidate_data_caches:
+
+	/*
+	 * Clean and invalidate the sets and ways of all data or unified cache
+	 * levels using DCCISW (Data Cache line Clean and Invalidate by
+	 * Set/Way).
+	 */
+	ARM_DATA_CACHE_LOOP_SET_WAY c14
+
+.Ldata_caches_initialized:
+
+	/*
+	 * Invalidate the instruction cache levels using ICIALLU (Instruction
+	 * Cache Invalidate All to PoU).
+	 */
+	mov	r0, #0
+	mcr	p15, 0, r0, c7, c5, 0
+
+	/* Enable SCTLR[I, C] */
+	mrc	p15, 0, r0, c1, c0, 0
+	orr	r1, r0, #0x1000
+	orr	r1, r1, #0x4
+	mcr	p15, 0, r1, c1, c0, 0
+	isb
+
+    ldmfd sp!, {r0-r1}
+
+    bx    lr
 
 /*-------------------------------------------------------------------------------*/
 @ Initialize Mpu: pulled from LC4357 R5f Halcogen generation
@@ -675,7 +706,7 @@ _mpuInit_:
         mcr   p15, #0,    r0, c6, c2, #0
         ldr   r0,  r6Base
         mcr   p15, #0,    r0, c6, c1, #0
-        mov   r0,  #0x0006
+        mov   r0,  #0x0002
         orr   r0,  r0,    #0x0300
         mcr   p15, #0,    r0, c6, c1, #4
         movw  r0,  #((0 << 15) + (0 << 14) + (0 << 13) + (0 << 12) + (0 << 11) + (0 << 10) + (0 <<  9) + (0 <<  8) + (0x1A << 1) + (1))

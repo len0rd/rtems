@@ -6,7 +6,7 @@ copyrights:
 cppflags: []
 cxxflags: []
 enabled-by:
-- ARM_TMS570LC4357
+- ARM_TMS570LC4357_HDK
 includes: []
 install:
 - destination: ${BSP_INCLUDEDIR}/bsp/ti_herc
