@@ -44,8 +44,18 @@
 #include <rtems.h>
 #include <bsp/default-initial-extension.h>
 
-#define BSP_OSCILATOR_CLOCK 8000000
-#define BSP_PLL_OUT_CLOCK 160000000
+#if TMS570_VARIANT == 4357
+    /// On the LC43 devboard, the High-Speed-External oscillator ("OSC") is 16MHz
+    #define BSP_OSCILATOR_CLOCK 16000000
+    /// (TM) TODO: This shouldnt be hardcoded. It should be solved for based on PLL register config
+    ///     and external oscillator input frequency. This value should be equal to the HCLK domain frequency
+    #define BSP_PLL_OUT_CLOCK 150000000
+#elif TMS570_VARIANT == 3137
+    #define BSP_OSCILATOR_CLOCK 8000000
+    #define BSP_PLL_OUT_CLOCK 160000000
+#else
+    #warning "Unknown or no TMS570 BSP variant defined"
+#endif
 
 #endif /* ASM */
 

@@ -105,6 +105,19 @@ typedef struct{
 } tms570_sys1_t;
 
 
+typedef enum
+{
+    TMS570_ESR_RSTSRC_POWERON_RESET = 0x8000U,      /**< Alias for Power On Reset     */
+    TMS570_ESR_RSTSRC_OSC_FAILURE_RESET = 0x4000U,  /**< Alias for Osc Failure Reset  */
+    TMS570_ESR_RSTSRC_WATCHDOG_RESET = 0x2000U,     /**< Alias for Watch Dog Reset    */
+    TMS570_ESR_RSTSRC_DEBUG_RESET = 0x0800U,        /**< Alias for Debug Reset        */
+    TMS570_ESR_RSTSRC_INTERCONNECT_RESET = 0x0080U, /**< Alias for Interconnect Reset */
+    TMS570_ESR_RSTSRC_CPU0_RESET = 0x0020U,         /**< Alias for CPU 0 Reset        */
+    TMS570_ESR_RSTSRC_SW_RESET = 0x0010U,           /**< Alias for Software Reset     */
+    TMS570_ESR_RSTSRC_EXT_RESET = 0x0008U,          /**< Alias for External Reset     */
+    TMS570_ESR_RSTSRC_NO_RESET = 0x0000U            /**< Alias for No Reset           */
+} tms570_esr_reset_source_t;
+
 /*---------------------TMS570_SYS1_SYSPCx---------------------*/
 /* field: ECPCLKFUN - ECLK function. This bit changes the function of the ECLK pin. */
 #define TMS570_SYS1_SYSPCx_ECPCLKFUN BSP_BIT32(0)

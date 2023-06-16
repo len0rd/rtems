@@ -1,0 +1,16 @@
+SPDX-License-Identifier: CC-BY-SA-4.0 OR BSD-2-Clause
+build-type: objects
+cflags: []
+copyrights:
+- Copyright (C) 2020 embedded brains GmbH (http://www.embedded-brains.de)
+cppflags: []
+cxxflags: []
+enabled-by:
+- ARM_TMS570LC4357_HDK
+includes: []
+install: []
+links: []
+source:
+  # Hardware Init (hwinit) sources specific to the Hardware DevKit (HDK)
+  - bsps/arm/tms570/start/tms570_hwinit_board_lc4357_hdk.c
+type: build

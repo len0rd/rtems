@@ -330,9 +330,12 @@ void tms570_pbist_run(
 {
   volatile uint32_t i = 0U;
 
-  /* PBIST ROM clock frequency = HCLK frequency /2 */
+  /* For LS3137 PBIST ROM clock frequency = HCLK  / MSTGCR[9:8] */
+  /* For LC4357 PBIST ROM clock frequency = GCLK1 / MSTGCR[9:8] 
+        Max is either 100MHz (TRM s9.1.1) or 82.5MHz (TRM s9.3.1.2)
+  */
   /* Disable memory self controller */
-  TMS570_SYS1.MSTGCR = 0x00000105U;
+  TMS570_SYS1.MSTGCR = 0x00000305U;
 
   /* Disable Memory Initialization controller */
   TMS570_SYS1.MINITGCR = 0x5U;
@@ -346,11 +349,11 @@ void tms570_pbist_run(
   /* wait for 32 VBUS clock cycles at least, based on HCLK to VCLK ratio */
   /*SAFETYMCUSW 134 S MR:12.2 <APPROVED> "Wait for few clock cycles (Value of i not used)" */
   /*SAFETYMCUSW 134 S MR:12.2 <APPROVED> "Wait for few clock cycles (Value of i not used)" */
-  for ( i = 0U; i < ( 32U + ( 32U * 1U ) ); i++ ) { /* Wait */
+  for ( i = 0U; i < ( 64 + ( 64 * 1U ) ); i++ ) { /* Wait */
   }
 
   /* Enable PBIST clocks and ROM clock */
-  TMS570_PBIST.PACT = 0x3U;
+  TMS570_PBIST.PACT = 0x1U;
 
   /* Select all algorithms to be tested */
   TMS570_PBIST.ALGO = algomask;

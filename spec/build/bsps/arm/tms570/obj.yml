@@ -69,11 +69,14 @@ install:
 - destination: ${BSP_LIBDIR}
   source:
   - bsps/arm/tms570/start/linkcmds.tms570ls3137_hdk
+  - bsps/arm/tms570/start/linkcmds.tms570lc4357_hdk
   - bsps/arm/tms570/start/linkcmds.tms570ls3137_hdk_intram
   - bsps/arm/tms570/start/linkcmds.tms570ls3137_hdk_sdram
   - bsps/arm/tms570/start/linkcmds.tms570ls3137_hdk_with_loader
+  - bsps/arm/tms570/start/linkcmds.tms570lc4357_hdk_sdram
 links: []
 source:
+- bsps/arm/tms570/start/tms570_sys_core.S
 - bsps/arm/shared/cp15/arm-cp15-set-exception-handler.c
 - bsps/arm/shared/cp15/arm-cp15-set-ttb-entries.c
 - bsps/arm/shared/start/bsp-start-memcpy.S
@@ -86,7 +89,8 @@ source:
 - bsps/arm/tms570/start/bspstart.c
 - bsps/arm/tms570/start/pinmux.c
 - bsps/arm/tms570/start/tms570-pom.c
-- bsps/shared/cache/nocache.c
+- bsps/arm/shared/cache/cache-cp15.c
+- bsps/arm/shared/cache/cache-v7ar-disable-data.S
 - bsps/shared/dev/btimer/btimer-cpucounter.c
 - bsps/shared/dev/getentropy/getentropy-cpucounter.c
 - bsps/shared/dev/serial/console-termios.c

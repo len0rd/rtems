@@ -1,0 +1,17 @@
+SPDX-License-Identifier: CC-BY-SA-4.0 OR BSD-2-Clause
+build-type: objects
+cflags: []
+copyrights:
+- Copyright (C) 2020 embedded brains GmbH (http://www.embedded-brains.de)
+cppflags: []
+cxxflags: []
+enabled-by:
+- ARM_TMS570LS3137
+includes: []
+install: []
+links: []
+source:
+- bsps/arm/tms570/start/bspstarthooks_hwinit_tms570ls3137.c
+# included in the base ls3137 yaml since the the only board supported for the ls3137 is the Hardware DevKit (HDK)
+- bsps/arm/tms570/start/tms570_hwinit_board_ls3137_hdk.c
+type: build

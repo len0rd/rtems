@@ -1,26 +1,129 @@
+/** @file
+
+   based on Ti HalCoGen generated file
+ */
+
+/*
+ * Copyright (C) 2009-2015 Texas Instruments Incorporated - www.ti.com
+ *
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *    Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ *    Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the
+ *    distribution.
+ *
+ *    Neither the name of Texas Instruments Incorporated nor the names of
+ *    its contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ *  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ *  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ *  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+
 #include <stdint.h>
-#include <bsp.h>
-#include <bsp/start.h>
+#include <stdbool.h>
 #include <bsp/tms570.h>
-
+#include <bsp/tms570-pinmux.h>
 #include <bsp/tms570_selftest.h>
-#include <bsp/tms570_selftest_parity.h>
 #include <bsp/tms570_hwinit.h>
+#include <bsp/start.h>
+#include <bsp/tms570_selftest_parity.h>
 
-static inline
-int tms570_running_from_tcram( void )
+/**
+ * @brief Adjust Low-Frequency (LPO) oscilator (HCG:trimLPO)
+ *
+ */
+/* SourceId : SYSTEM_SourceId_002 */
+/* DesignId : SYSTEM_DesignId_002 */
+/* Requirements : HL_SR468 */
+void tms570_trim_lpo_init( void )
 {
-  void *fncptr = (void*)bsp_start_hook_0;
-  return ( fncptr >= (void*)TMS570_TCRAM_START_PTR ) &&
-         ( fncptr < (void*)TMS570_TCRAM_WINDOW_END_PTR );
+  /** @b Initialize Lpo: */
+  /** Load TRIM values from OTP if present else load user defined values */
+  /*SAFETYMCUSW 139 S MR:13.7 <APPROVED> "Hardware status bit read check" */
+  TMS570_SYS1.LPOMONCTL = TMS570_SYS1_LPOMONCTL_BIAS_ENABLE |
+                          TMS570_SYS1_LPOMONCTL_OSCFRQCONFIGCNT * 0 |
+                          TMS570_SYS1_LPOMONCTL_HFTRIM( 16 ) |
+                          16; /* LFTRIM  */
 }
 
-static inline
-int tms570_running_from_sdram( void )
+/* FIXME */
+enum tms570_flash_power_modes {
+  TMS570_FLASH_SYS_SLEEP = 0U,     /**< Alias for flash bank power mode sleep   */
+  TMS570_FLASH_SYS_STANDBY = 1U,   /**< Alias for flash bank power mode standby */
+  TMS570_FLASH_SYS_ACTIVE = 3U     /**< Alias for flash bank power mode active  */
+};
+
+/**
+ * @brief Setup Flash memory parameters and timing (HCG:setupFlash)
+ *
+ */
+/* SourceId : SYSTEM_SourceId_003 */
+/* DesignId : SYSTEM_DesignId_003 */
+/* Requirements : HL_SR457 */
+void tms570_flash_init( void )
 {
-  void *fncptr = (void*)bsp_start_hook_0;
-  return ( ( (void*)fncptr >= (void*)TMS570_SDRAM_START_PTR ) &&
-           ( (void*)fncptr < (void*)TMS570_SDRAM_WINDOW_END_PTR ) );
+  /** - Setup flash read mode, address wait states and data wait states */
+  TMS570_FLASH.FRDCNTL = TMS570_FLASH_FRDCNTL_RWAIT( 3 ) |
+                         TMS570_FLASH_FRDCNTL_ASWSTEN |
+                         TMS570_FLASH_FRDCNTL_ENPIPE;
+
+  /** - Setup flash access wait states for bank 7 */
+  TMS570_FLASH.FSMWRENA = TMS570_FLASH_FSMWRENA_WR_ENA( 0x5 );
+  TMS570_FLASH.EEPROMCONFIG = TMS570_FLASH_EEPROMCONFIG_EWAIT( 3 ) |
+                              TMS570_FLASH_EEPROMCONFIG_AUTOSUSP_EN * 0 |
+                              TMS570_FLASH_EEPROMCONFIG_AUTOSTART_GRACE( 2 );
+
+  /** - Disable write access to flash state machine registers */
+  TMS570_FLASH.FSMWRENA = TMS570_FLASH_FSMWRENA_WR_ENA( 0xA );
+
+  /** - Setup flash bank power modes */
+  TMS570_FLASH.FBFALLBACK = TMS570_FLASH_FBFALLBACK_BANKPWR7(
+    TMS570_FLASH_SYS_ACTIVE ) |
+                            TMS570_FLASH_FBFALLBACK_BANKPWR1(
+    TMS570_FLASH_SYS_ACTIVE ) |
+                            TMS570_FLASH_FBFALLBACK_BANKPWR0(
+    TMS570_FLASH_SYS_ACTIVE );
+}
+
+/**
+ * @brief Power-up all peripherals and enable their clocks (HCG:periphInit)
+ *
+ */
+/* SourceId : SYSTEM_SourceId_004 */
+/* DesignId : SYSTEM_DesignId_004 */
+/* Requirements : HL_SR470 */
+void tms570_periph_init( void )
+{
+  /** - Disable Peripherals before peripheral powerup*/
+  TMS570_SYS1.CLKCNTL &= ~TMS570_SYS1_CLKCNTL_PENA;
+
+  /** - Release peripherals from reset and enable clocks to all peripherals */
+  /** - Power-up all peripherals */
+  TMS570_PCR1.PSPWRDWNCLR0 = 0xFFFFFFFFU;
+  TMS570_PCR1.PSPWRDWNCLR1 = 0xFFFFFFFFU;
+  TMS570_PCR1.PSPWRDWNCLR2 = 0xFFFFFFFFU;
+  TMS570_PCR1.PSPWRDWNCLR3 = 0xFFFFFFFFU;
+
+  /** - Enable Peripherals */
+  TMS570_SYS1.CLKCNTL |= TMS570_SYS1_CLKCNTL_PENA;
 }
 
 #define PBIST_March13N_SP        0x00000008U  /**< March13 N Algo for 1 Port mem */
@@ -373,48 +476,3 @@ BSP_START_TEXT_SECTION void bsp_start_hook_0( void )
   bsp_start_hook_0_done();
 #endif
 }
-
-BSP_START_TEXT_SECTION void bsp_start_hook_1( void )
-{
-  /* At this point we can use objects outside the .start section  */
-#if 0
-  /* Do not run attempt to initialize MPU when code is running from SDRAM */
-  if ( !tms570_running_from_sdram() ) {
-    /*
-     * MPU background areas setting has to be overlaid
-     * if execution of code is required from external memory/SDRAM.
-     * This region is non executable by default.
-     */
-    _mpuInit_();
-  }
-#endif
-  tms570_emif_sdram_init();
-
-  bsp_start_copy_sections();
-  bsp_start_clear_bss();
-}
-
-/*
- * Chip specific list of peripherals which should be tested
- * for functional RAM parity reporting
- */
-const tms570_selftest_par_desc_t *const
-tms570_selftest_par_list[] = {
-  &tms570_selftest_par_het1_desc,
-  &tms570_selftest_par_htu1_desc,
-  &tms570_selftest_par_het2_desc,
-  &tms570_selftest_par_htu2_desc,
-  &tms570_selftest_par_adc1_desc,
-  &tms570_selftest_par_adc2_desc,
-  &tms570_selftest_par_can1_desc,
-  &tms570_selftest_par_can2_desc,
-  &tms570_selftest_par_can3_desc,
-  &tms570_selftest_par_vim_desc,
-  &tms570_selftest_par_dma_desc,
-  &tms570_selftest_par_spi1_desc,
-  &tms570_selftest_par_spi3_desc,
-  &tms570_selftest_par_spi5_desc,
-};
-
-const int tms570_selftest_par_list_size =
-  RTEMS_ARRAY_SIZE( tms570_selftest_par_list );
