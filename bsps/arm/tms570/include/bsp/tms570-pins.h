@@ -10,9 +10,9 @@
 #define __TMS570_PINS_H__
 #include <bspopts.h>
 
-#if defined(ARM_TMS570LC4357)
+#if TMS570_VARIANT == 4357
     #include <bsp/tms570lc4357-pins.h>
-#elif defined(ARM_TMS570LS3137)
+#elif TMS570_VARIANT == 3137
     #include <bsp/tms570ls3137zwt-pins.h>
 #else
     #warning "Unknown or no TMS570 BSP variant defined"

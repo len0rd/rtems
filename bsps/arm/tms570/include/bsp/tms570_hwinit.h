@@ -20,6 +20,7 @@ void _coreDisableRamEcc_( void );
 void _mpuInit_( void );
 void _mpuDisable_( void );
 void _ramInit_(void);
+void _cacheEnable_(void);
 
 void tms570_memory_init( uint32_t ram );
 void tms570_trim_lpo_init( void );

@@ -72,11 +72,12 @@ bsp_start_vector_table_begin:
 	ldr	pc, .Lhandler_addr_abort
 
 	/* Program signature checked by boot loader */
-	.word	0xb8a06f58
 
+	ldr	pc, .Lhandler_addr_irq
 	ldr	pc, .Lhandler_addr_irq
 	ldr	pc, .Lhandler_addr_fiq
 
+.balign 64
 .Lhandler_addr_reset:
 
 #ifdef BSP_START_RESET_VECTOR
